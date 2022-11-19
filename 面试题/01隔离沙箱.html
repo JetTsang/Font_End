@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隔离沙箱</title>
+</head>
+<body>
+    <script id="sc">
+        // 基础方案1.
+        // 利用with + eval去 确定作用域的问题 , 执行的时候会去获取上下文的对象替换window的值
+        // 开始 code  
+        const code = `
+            console.log('这是code里面执行的代码');
+            console.log('这是foo');
+            console.log(foo)
+            console.log('这是window');
+            console.log(window)
+            console.log(window.foo)
+            console.log('这是this');
+            console.log(this.foo)
+            console.log(to)
+            console.log(this === window)
+        `
+        const ctx = {
+            foo:'这是with传入的上下文foo变量',
+            to:'这是with传入的上下文to变量',
+            window:'内部的window',
+            // ...window,
+            // console:window.console
+        }
+        var foo = '全局windows变量的foo'
+        var to = '全局windows变量的to'
+        function create_veryPoorSandBox (code,ctx){
+            with(ctx){
+                    eval(code)
+                    // code
+                    console.log(0.0000000000)
+            }
+        }
+
+        console.log('执行sanbbox');
+        create_veryPoorSandBox(code,ctx)
+        // create_veryPoorSandBox(code,ctx).call(ctx)
+        console.log('执行sanbbox结束');
+        console.log('外面的foo',foo)
+        //  存在的问题： with+eval的方式 仍然会去window获取不存在的变量，
+        //  并且如果直接用windows，仍然避免不了去访问外部的windows
+        console.log('********************************')
+
+
+
+
+        // 改进方案 
+        // with + eval + proxy
+        // 这里用 new Function去包装
+        function wrapeWithFn(code){
+            const fnCode =  `
+                with(shadowCtx){
+                    console.log('12132')
+                    //注意：这里的code本身已经是字符串了，与外面with一样，无需使用eval去执行字符串，调用call的时候回执行
+                    ${code}
+                }
+            `
+            return new Function("shadowCtx",fnCode)
+        }
+
+        // 等价于
+        // function a(shadowCtx) {
+        //     with(shadowCtx){
+        //             console.log('12132')
+        //             ${code} 
+        //         }
+        // }
+        // 如果你这用code 
+        // 则相当于你eval（这里也是代码）
+        function create_lettilePoorFn(code,ctx){
+            wrapeWithFn(code).call(ctx,ctx)
+        }
+
+        // 白名单
+        const whiteList = ['console']
+        function proxyMyCTX(ctx,whiteList){
+            return new Proxy(ctx,{
+                // 返回true则表示存在，返回false则表示不存在 ，此时回去向上作用域寻找
+                has:function(target,prop){
+                    if(whiteList.includes(prop)){
+                        return target.hasOwnProperty(prop) // true则自己有，返回false则去上级作用域找
+                    }
+                    // 如果不在白名单并且本身没有，则报错
+                    if(!target.hasOwnProperty(prop)){
+                         throw new Error('Not found property - '+prop+'!')
+                    }
+                    // 如果不在白名单，但本身有的，返回true。让系统去读取
+                    return true
+                }
+            })
+        }
+        create_lettilePoorFn(code,proxyMyCTX(ctx,whiteList))
+
+        // 方案3  使用iframe.contentWindow去作为ctx
+        // 1. 创建iframe
+        // 2. display:none
+        // 3. append到body
+        // 4. 拿到contentWindow
+        // 5. contentWindow作为代理，返回代理对象
+
+        // 建造一个class 去构造这样一个场景 
+        class MySandbox {
+            iframeWindow = null
+            proxyOption = null
+            proxyCtx = null
+            constructor (code  ,balckList){
+                const iframe = document.createElement('iframe')
+                document.body.appendChild(iframe)
+                iframe.style.display = 'none'
+                this.iframeWindow = iframe.contentWindow
+
+                this.proxyOption =  this.createProxyOption(balckList)
+                this.proxyCtx = this.proxyWindow(this.iframeWindow,this.proxyOption)
+                this.execCode(code)
+            }
+            execCode(code){
+                this.wrapeWithFn(code).call(this.proxyCtx,this.proxyCtx)
+            }
+            wrapeWithFn(code){
+                code = `
+                    with(ctx){
+                        ${code}
+                    }
+                `
+                return new Function('ctx',code)
+            }
+            proxyWindow(iframeWindow,balckList){
+                return new Proxy(iframeWindow,this.proxyOption)
+            }
+            createProxyOption(balckList = []){
+                return {
+                    has:function(target,prop){
+                        // 1. 在黑名单里
+                        if(balckList.includes(prop)){
+                            throw new Error('This Property is in BlackList')
+                        }
+                        // 2， 不在本身的属性里
+                        if(!target.hasOwnProperty(prop)){
+                            throw new Error("This didn't have this property")
+                        }
+
+                        // 3. 在本身属性里，返回true
+
+                        return true 
+                    }
+                }
+            }
+        }
+        console.log('********************************');
+        const balckList = []
+        var codes = 
+        `
+            const a  = '这是我代码块里的a'
+            
+            console.log(a)
+            let c = 'ccc'
+            console.log(c)
+            let d = new XMLHttpRequest()
+            console.log(d)
+            console.log(foo)
+        `
+        const sandBox =  new MySandbox(codes,balckList)
+        // console.log(sandBox);
+        // new XMLHttpRequest()
+        // 总结： 不能用var 去声明在块里的变量了。
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        svg {
+            background: #101010;
+        }
+
+        svg text {
+            font-size: 10vw;
+            font-weight: 900;
+            stroke-width: 2px;
+            fill: transparent;
+            /* 这里的stroke就是文字的路径 */
+            stroke: #d46790;
+            letter-spacing: 4px;
+            /* 代表dash虚线的间距*/
+            /* 设置为100%，则下一段为空 */
+            stroke-dasharray: 100% !important;  
+            /* 代表 虚线相对于起点的偏移量 */
+            /* 再设置偏移量，则开始显示为空 */
+            stroke-dashoffset: 100%;
+            animation: line-anm 6s forwards;
+        }
+
+        @keyframes line-anm {
+            to {
+                /* 重新这只 */
+                stroke-dashoffset: 0;
+                /* 填充自体颜色 */
+                fill: #fff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="100%" height="100vh">
+        <text x="5%" y="55%">Loading</text>
+    </svg>
+</body>
+
+</html>
