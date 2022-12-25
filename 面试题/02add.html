@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 题目： 设计add 函数 ，实现 add(1)(2)(3)(4)   在控制台打印 10 
+        var add = function  (m){
+
+            var middleFn =function(n){
+                return add(m + n)
+            }
+            middleFn.prototype.toString = function(){
+                return m
+            }
+            return middleFn
+        }
+        add(1)(2)(3)(4)
+    </script>
+</body>
+</html>

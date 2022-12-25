@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>flex布局小试</title>
+    <style>
+        .container { 
+            width: 500px;
+            height: 500px;
+            border: 1px dashed red;
+            margin: auto;
+            overflow: auto;
+        }
+        nav {
+            display: flex;
+            overflow: auto;  
+        }
+        .items {
+            border: 1px solid pink;
+            /* width: 100px; */
+            /* 对flex布局下不适用压缩 */
+            flex-shrink: 0; 
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <h2>felxshrink巧妙实现横向滚动tab</h2>
+    <div class="container">
+        <nav>
+            <div class="items">小剧场aaaaa</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+            <div class="items">小剧场</div>
+        </nav>
+    </div>
+</body>
+</html>

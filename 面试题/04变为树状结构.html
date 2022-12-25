@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04变为树状结构</title>
+</head>
+<body>
+    <script>
+        const List = [
+                    { id: 1, title: "child1", parentId: 0 },
+                    { id: 2, title: "child2", parentId: 0 },
+                    { id: 3, title: "child1_1", parentId: 1 },
+                    { id: 4, title: "child1_2", parentId: 1 },
+                    { id: 5, title: "child2_1", parentId: 2 },
+                    { id: 6, title: "child2_1", parentId: 3 },
+                    ]
+        // 将list变为树结构
+        function toTree(list){
+            if(!list.length) return []
+            const res = []
+            const temp = new Map()
+            list.forEach(i=>temp.set(i.id,i))
+            list.forEach(i=>{
+                if(temp.get(i.parentId)){
+                    if(
+
+                        temp.get(i.parentId)['children']
+                    ){
+                        temp.get(i.parentId)['children'].push(i)
+                    }else{
+                        temp.get(i.parentId)['children'] = [i]
+                    }
+                }else{
+                    res.push(i)
+                }
+            })
+            return res
+        }
+        const tree = toTree(List)
+        console.log(tree);
+        // 将树平铺变成li
+        function toFlatList (tree){
+            const res = []
+            tree.forEach(i=>{
+                if(i.children && i.children.length){
+                    res.push(...toFlatList(i.children))
+                }
+                res.push(i)
+                
+            })
+            return res 
+        }
+        console.log(
+            toFlatList(tree)
+        )
+    </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Js外网44题</title>
+    <style>
+        .subject {}
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        var subjectList = [
+            {
+                title: "parseInt 遇上 map",
+                code: `["1", "2", "3"].map(parseInt)`,
+            },
+            {
+                title: "神奇的null",
+                code: `[typeof null, null instanceof Object]`,
+            },
+            {
+                title: "愤怒的reduce",
+                code: `[ [3,2,1].reduce(Math.pow), [].reduce(Math.pow) ]`,
+            },
+            {
+                title: "该死的优先级",
+                code: `
+                    var val = 'smtg';
+                    console.log('Value is ' + (val === 'smtg') ? 'Something' : 'Nothing');
+                `,
+            },
+            {
+                title: "神鬼莫测之变量提升",
+                code: `
+                    var name = 'World!';
+                    (function () {
+                        if (typeof name === 'undefined') {
+                        var name = 'Jack';
+                        console.log('Goodbye ' + name);
+                        } else {
+                        console.log('Hello ' + name);
+                        }
+                    })();
+                `,
+            },
+
+            {
+                title: "死循环陷阱",
+                code: `
+                    var END = Math.pow(2, 53);
+                    var START = END - 100;
+                    var count = 0;
+                    for (var i = START; i <= END; i++) { 
+                    count++;
+                    }
+                    console.log(count);
+                    // A. 0
+                    // B. 100
+                    // C. 101
+                    // D. other
+                `,
+            },
+            {
+                title: "过滤器魔法",
+                code: `var ary = [0,1,2];
+                        ary[10] = 10;
+                        ary.filter(function(x) {
+                        return x === undefined;
+                        });
+
+                        // A. [undefined x 7]
+                        // B. [0, 1, 2, 10]
+                        // C. []
+                        // D. [undefined]`,
+            },
+            {
+                title: " 警惕IEEE 754标准",
+                code: `var two = 0.2;
+                    var one = 0.1;
+                    var eight = 0.8;
+                    var six = 0.6;
+                    [two - one == one, eight - six == two]`,
+            },
+            {
+                title: "字符串陷阱",
+                code: `
+                function showCase(value) {
+                switch(value) {
+                    case 'A':
+                    console.log('Case A');
+                    break;
+                    case 'B':
+                    console.log('Case B');
+                    break;
+                    case undefined:
+                    console.log('undefined');
+                    break;
+                    default:
+                    console.log('Do not know!');
+                }
+                }
+                showCase(new String('A'));
+                
+                
+                `,
+            },
+        ]
+        </script>
+        <script>
+        function execCode(code) {
+            try {
+                alert(eval(code))
+            } catch (error) {
+                alert(error)
+            }
+        }
+        function handleClick(e) {
+            execCode(subjectList[e]['code'])
+        }
+        function createHTML(item, index) {
+            return `
+            <div class="subject">
+                <h1>${index + 1}：${item.title}</h1>
+                <span>${item.code}</span>
+                <br>
+                <button onclick="handleClick(${index})">点击执行</button>
+            </div>
+            `
+        }
+        CreateApp.prototype.createHTML = createHTML
+        function CreateApp() {
+            this.app = document.getElementById('app')
+            this.subjectList = subjectList
+            this.app.innerHTML = this.subjectList.map((i, index) => this.createHTML(i, index)).join('')
+        }
+        var myApp = new CreateApp()
+    </script>
+</body>
+
+</html>

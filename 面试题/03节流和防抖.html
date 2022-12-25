@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>03节流和防抖</title>
+</head>
+<body>
+    <script>
+        // 节流： 
+        //  一段时间内，只执行第一次
+        // 应用场景 ：  高频时间 （scroll ，resize,mouseMove)
+        // 实现代码 
+        function throttle (fn,delay){
+            let timer = null
+            return (arg)=>{
+                if(timer) return 
+                timer = setTimeout(()=>{
+                    fn.call(fn,arg)
+                    // 执行完记得清除！
+                    clearTimeout(timer)
+                    timer = null
+                },delay*1000)
+            }
+        }
+        // use 
+        window.addEventListener('scroll',throttle(()=>{}))
+        //  防抖： 
+        //  一段时间内不断的触发，只执行最后一次 
+        //  应用场景：  文本自动保存 ， 搜索 
+        function debounce (fn,delay){
+            let timer = null
+            return (arg)=>{
+                if(timer){
+                    clearTimeout(timer)
+                    timer = null
+                }
+                timer = setTimeout(()=>{
+                    fn.call(fn,arg)
+                    // 执行完清除
+                    timer = null
+                },delay*1000)
+            }
+        }
+        // 同时，这俩也是，闭包的应用
+    </script>
+    <!-- 什么是节流？  -->
+    <!--  -->
+</body>
+</html>
