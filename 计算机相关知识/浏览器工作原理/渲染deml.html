@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .ball {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            border-radius: 50%;
+            margin-top: 16px;
+        }
+
+        @keyframes move {
+            0% {
+                left: 0px;
+            }
+
+            100% {
+                left: 50%;
+            }
+        }
+
+        @keyframes moveBytrans {
+            0% {
+                transform: translateX(0px)
+            }
+
+            100% {
+                transform: translateX(calc(50%))
+            }
+        }
+
+        .ball1 {
+            position: relative;
+            animation: move 1s linear infinite alternate;
+        }
+
+        .ball2 {
+            animation: moveBytrans 1s linear infinite alternate;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ball ball1">
+
+    </div>
+    <div class="ball ball2">
+
+    </div>
+
+    <button id="btn">
+        点击阻塞渲染线程
+    </button>
+    <script>
+        btn.onclick = () => {
+            // 	alert就能够阻塞主进程
+            // alert('btn')
+            delay(5000)
+        }
+        function delay(dulation) {
+            console.log(000);
+            let now = new Date()
+            while((new Date() - now) < dulation){
+            }
+        }
+    </script>
+</body>
+
+</html>

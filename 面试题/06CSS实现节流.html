@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS实现节流</title>
+    <style>
+        .buttons {
+            background-color: rgb(244, 148, 148);
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            user-select: none;
+        }
+        .buttons:active {
+            background-color: rgb(148, 67, 67);
+        }
+        .btns {
+            opacity: 1;
+            transition: opacity ease-in-out var(--throttleTime);
+        }
+        .btns:not(.btns:disabled).btns:active { 
+        /* .btns:active {  */
+            opacity: 0.99;
+            transition: none;
+        }
+        .btns:disabled { 
+            background-color: pink;
+        }
+    </style>
+</head>
+<body>
+    <button class="buttons">普通按钮</button>
+    <button class="buttons buttons_with_throttle" @click="onclick" style="--throttleTime:2s">节流按钮</button>
+    <button id="btn" class="btns" style="--throttleTime:2s">通过：disable设置</button>
+    <script>
+        // 实现思路： 
+        // 三大件 
+        // 1. :active 伪元素，按钮按下的时候会触发
+        // 2. pointer-events：none  | all  可以控制是否触发鼠标事件
+        // 3. animation 去控制时间段
+        // 首先给一个动画，末尾是all，当动画走完是all，此时能按下，利用active取消动画，
+    </script>
+    <script>
+        // 方法二，利用transition的事件来监听
+        //  通过监听去控制disabled的移除和显示
+        //  在 :active的时候（=点击了），去设置transition为none 
+        // （正常情况下transition为opacity ease duration)
+        //  但要注意，disable的时候，:active也会奏效
+        //  因此需要套一层：not(:disabled)来避免重复触发start事件
+        btn.addEventListener('transitionstart', () => {
+            console.log('transition 开始');
+            btn.setAttribute('disabled','')
+        });
+        btn.addEventListener('transitionend', () => {
+            console.log('transition 结束');
+            btn.removeAttribute('disabled')
+        });
+    </script>
+    <style>
+        @keyframes throttle {
+            from {
+                pointer-events: none;
+            }
+            to {
+                pointer-events: all;
+            }
+        }
+        .buttons_with_throttle{
+            animation: throttle var(--throttleTime) step-end forwards;
+        }
+        .buttons_with_throttle:active {
+            animation:none;
+        }
+    </style>
+</body>
+</html>
