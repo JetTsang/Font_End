@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 单例模式： 意味着全局只有一个实例
+        // 典型应用场景：  Vue React这
+
+        class Wannabe_bora{
+            constructor(){}
+            name= 'I am Super Start'
+            _instance = null
+            static getInstance(){
+                if(!this._instance){
+                    this._instance = new Wannabe_bora()
+                }
+                return this._instance
+            }
+        }
+        console.log(
+            Wannabe_bora.getInstance()
+        );
+        const a = Wannabe_bora.getInstance()
+        const b = Wannabe_bora.getInstance()
+        console.log( a === b);
+    </script>
+
+    <script>
+        // 单例模式的应用： modal层
+        // 也可以使用闭包去保持变量的存在
+        const Modal = (function(){
+            let instance = null
+            return function(){
+                if(!instance){
+                    instance = document.createElement('div')
+                    instance.style.display = 'none'
+                    instance.innerHTML = '这是弹出层捏'
+                    instance.className = 'el-modal'
+                    document.body.appendChild(instance)
+                }
+                return instance
+            }
+        })()
+        const ins = Modal()
+    </script>
+</body>
+</html>

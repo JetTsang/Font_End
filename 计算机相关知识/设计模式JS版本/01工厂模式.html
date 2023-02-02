@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script>
+        // 工厂模式：通过函数去不断产出实例
+        // 例子： jQuery ，react.CreateStore这种
+
+        function $(res){
+            return new Dom(res)
+        }
+        class Dom{
+            constructor(res){
+                this.ins = document.querySelector(res)
+            }
+        }
+        console.log($('#app'))
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 代理模式： 意思是在做什么之前，先代理一把
+        // 典型案例： proxy实现响应式
+
+        const obj = {
+            name:'我是张学友'
+        }
+        const proxy = new Proxy(obj,{
+            get:function(target,p){
+                console.log(target,p);
+                return target[p]
+            }
+        })
+        console.log(proxy.name);
+    </script>
+</body>
+</html>
