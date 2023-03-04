@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas{
+            border: 1px dashed lightblue;
+            /* width: var(--length);
+            height: var(--length); */
+        }
+        img{
+            width: var(--length);
+            height: var(--length);
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 注意这里的：style里面的宽高和给canvas的款高要一致，不然会有拖放效果 -->
+    <canvas id="signature"  style="--length:400px" width="400" height="400"></canvas>
+    <div>
+        <button id="btn" onclick="clear">清空画布</button>
+        <button id="btn2"  >展示画布</button>
+    </div>
+    <div id="show">
+        展示图片
+        <!-- <img  id="img" src="" style="--length:400px" alt=""> -->
+    </div> 
+    <script>
+        const canvas = document.getElementById('signature')
+        const ctx = canvas.getContext('2d')
+        const clear = ()=>{
+            console.log('晴空了');
+            ctx.clearRect(0,0,canvas.width,canvas.height)
+        }
+        // 移动端：  touchstart ： 开始画，建立初始点
+        //          touchmove ： 开始画
+        //          touchend: 移除事件绑定
+        canvas.addEventListener('touchstart',(e)=>{
+            console.log(e.touches[0]);
+            ctx.beginPath()
+            ctx.moveTo(e.offsetX,e.offsetY)
+        })
+        function clearMove(es){
+            draw({offsetX:es.touches[0].clientX,offsetY:es.touches[0].clientY})
+        }
+        canvas.addEventListener('touchmove',clearMove
+        )
+        function handlemouseEnter(){
+            canvas.addEventListener('mousedown',(e)=>{
+                // 开始绘制
+                ctx.beginPath()
+                // 确定起点
+                ctx.moveTo(e.offsetX,e.offsetY)
+                canvas.addEventListener('mousemove',draw)
+            })
+            canvas.addEventListener('mouseup',()=>{
+                canvas.removeEventListener('mousemove',draw)
+            })
+        }
+        // console.log(ctx);
+        // 创建画布
+        // 注意： over和enter的区别  ： over会有冒泡，子元素也会被触发，而enter则不会
+        // canvas.addEventListener('mouseover',handlemouseOver)
+        canvas.addEventListener('mouseenter',handlemouseEnter)
+        canvas.addEventListener('mouseleave',()=>{
+            canvas.removeEventListener('mouseenter',handlemouseEnter)
+        })
+        // 事件逻辑流 ： mouseenter --> mousedown --> mousemove  
+        //             mouseenter --> mouseUp --> mousemove(取消触发
+        //
+        const  draw= (e)=>{
+            // console.log(
+
+            //     e.offsetX,  // 相对于父元素的偏移量 ，如果是 元素，则相对于祖先元素不为static ，或者body
+            //     e.offsetY
+            // );
+            // 结束点
+            ctx.lineTo(e.offsetX,e.offsetY)
+            // 停止绘画
+            ctx.stroke()
+        }
+
+        btn.addEventListener('click',clear)
+        btn2.addEventListener('click',()=>
+        {   
+            const img = document.createElement('img')
+            img.src = canvas.toDataURL()
+            console.log(img)
+            console.log(canvas.toDataURL())
+            show.appendChild(img)
+        })
+
+    </script>
+</body>
+</html>
