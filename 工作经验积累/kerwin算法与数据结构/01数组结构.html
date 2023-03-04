@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 数组数据结构
+        // 常用方法
+        // 迭代器
+        const arr = [9,99,999]
+        const iterator = arr[Symbol.iterator]()
+        iterator.next() // 9
+        iterator.next() // 99
+        iterator.next() // 999
+        for(const i of arr){
+            console.log(i);
+        }
+        for(const i of arr.entries()){
+            console.log(i)
+        }
+        for(const i of arr.keys()){
+            console.log(i)
+        }
+        for(const i of arr.values()){
+            console.log(i)
+        }
+    </script>
+</body>
+</html>
