@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帧率监测</title>
+</head>
+<body>
+    <h2 id="h2"></h2>
+    <script>
+        const h2  = document.getElementById('h2')
+        function setFPS(num){
+            h2.innerHTML = '1s的平均帧率为：'+ num
+        }
+
+        function getFps(){
+            // 此轮开始记录的时间点
+            var startRecordTime = performance.now()
+            // 渲染次数 = 每1帧
+            var renderTimes = 0 
+            // 最近一帧渲染的时间点
+            var lastRenderTime = startRecordTime
+            function loop(){
+                // 此次渲染的时间
+                const thisRenderTime = performance.now()
+                ++renderTimes
+                // 此帧到开始记录的时间差
+                const thisRenderDetaTime = thisRenderTime - startRecordTime
+                lastRenderTime = thisRenderTime
+                if(thisRenderDetaTime<1000){
+                    // 小于1s内
+                    window.requestAnimationFrame(loop)
+                }else{
+                    const FPS = Math.round((1000*renderTimes)/(thisRenderDetaTime))
+                    // 大于等于1s,重新计时
+                    startRecordTime = thisRenderTime 
+                    renderTimes = 0
+                    setFPS(FPS)
+                    loop()
+                }
+            }
+            loop()
+        }
+        getFps()
+    </script>
+</body>
+</html>
