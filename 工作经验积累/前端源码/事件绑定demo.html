@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="invoker">Vue绑定</button>
+    <button id="tradition">传统绑定</button>
+    <script>
+        const invokerBTN = document.getElementById('invoker')
+        const traditionBTN = document.getElementById('tradition')
+        const tryTimes = 1000000
+        const eventInvoker = {
+        'click':()=>{
+                console.log('clicked!');
+            }
+        }
+        function testTra(){
+            console.time('traditional event handler')
+            let j = 0 
+            while(j<tryTimes){
+                for(i in eventInvoker){
+                    traditionBTN.addEventListener(i,eventInvoker[i])
+                    traditionBTN.removeEventListener(i,eventInvoker[i])
+                }
+                j++
+            }
+            console.timeEnd('traditional event handler')
+        }
+        // vei = vue event invokers
+       const vei = {}
+        function testInvoke(){
+            console.time('vue event handler')
+            let j = 0 
+            while(j<tryTimes){
+                for(i in eventInvoker){
+                    let invoker = vei[i]
+                    if(!invoker){
+                        invoker = (e)=>{
+                            invoker.value && invoker.value(e)
+                        }
+                        invoker.value = eventInvoker[i]
+                        invokerBTN.addEventListener(i,invoker)
+                        vei[i] = invoker
+                    }else{
+                        invoker.value = eventInvoker[i]
+                    }
+                }
+                j++
+            }
+            console.timeEnd('vue event handler')
+        }
+        testTra()
+        testInvoke()
+    </script>
+</body>
+</html>
