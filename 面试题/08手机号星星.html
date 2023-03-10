@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机号</title>
+</head>
+<body>
+    <script>
+        // 实现手机号 13222222222 显示成 132****2222
+        // 思路： 正则表达式  结合replace将中间替换成****
+
+        const teleNum = '13212345678'
+        const reg = /^(\d{3})(\d{4})(\d{4})$/g
+        // 在replace里面，$1则代表第一个小括号里面的内容
+        const str = teleNum.replace(reg,'$1****$3')
+        console.log(str);
+    </script>
+</body>
+</html>
