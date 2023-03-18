@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 选择排序 
+        // 从index开始，找到最小的放在第一位，第二位。。。以此类推
+        function chooseSort(numbers){
+            const { length }  = numbers
+            let minIndex   // 最小的值的索引
+            // 无需遍历到最后一个值
+            for(let i = 0 ; i<length-1;i ++){
+                minIndex = i
+                // 需要遍历到最后一个值
+                for(let j =i+1 ; j < length;j ++ ){
+                    if(numbers[minIndex] > numbers[j]){
+                        minIndex = j 
+                    }
+                }
+                if(minIndex !==i){
+                    swap(numbers,i,minIndex)
+                }
+            }
+            console.log(numbers)
+        }   
+        function swap (arr,index1,index2){
+            const temp = arr[index1]
+            arr[index1] = arr[index2]
+            arr[index2] = temp
+        }
+        chooseSort([9,8,7,6])
+    </script>
+</body>
+</html>
