@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container{
+            background-color: pink;
+            /* 启动bfc */
+            overflow: hidden;  
+            /* position: fixed ; */
+            /* display: inline-block; */
+        }
+        .box{
+            width: 200px;
+            height: 200px;
+            background-color: blueviolet;
+        }
+        .box1{
+            float: left;
+        }
+        .box2 {
+            float: right;
+        }
+        .boxMargin{
+            margin: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>1.float脱离文档流</h1>
+    <div class="container">
+        <div class="box box1"></div>
+        <div class="box box2"></div>
+    </div>
+    <h1>2.外边距塌陷</h1>
+    <div class="container">
+        <div class="box boxMargin"></div>
+        <!-- 解决办法：用一个触发bfc的盒子包裹,让里面不受外面的影响 -->
+        <div style="overflow: hidden;">
+            <div class="box boxMargin"></div>
+        </div>
+    </div>
+    <h1>3.两列布局</h1>
+    <!-- <div class="container"> -->
+        <div style="float: left; border: 1px solid red;">
+            两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局
+        </div>
+        <div style="width: 300px; border: 1px solid red; display: inline-block;">
+            我是蛙人，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭
+        </div>
+    <!-- </div> -->
+
+    <script>
+        // 问题： 什么是BFC 它解决了什么问题？ 
+        // Block Formatting Context
+        // 块级格式上下文
+        // 如何触发？
+        // 下面的属性都会触发
+        // overflow hidden 
+        // display inline-block table-cell flex
+        // position absolute / fixed 
+    </script>
+</body>
+</html>
