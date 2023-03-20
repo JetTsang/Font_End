@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas{
+            background-color: pink;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500">
+        <div> 你的浏览器不支持Canvas </div>
+    </canvas>
+
+
+    <script>
+        const canvas = document.querySelector('#canvas')
+        const ctx = canvas.getContext('2d')
+        // 新建一条路径，生成之后，图形绘制命令被指向到路径上生成路径。
+        ctx.beginPath()
+        // 起点,类比于下笔
+        ctx.moveTo(100,50)
+        // 路径点
+        ctx.lineTo(100,100)
+        ctx.lineTo(50,100)
+
+        // 画完可以闭合路径，使得图形绘制命令又重新指向到上下文中。
+        ctx.closePath()
+
+        // 有路径之后，需要通过线条来绘制图形轮廓。
+        ctx.stroke()
+        // 填充
+        ctx.fill()
+
+
+        // 正方形
+
+        ctx.rect(150,150,10,10)
+        ctx.stroke()
+        ctx.fill()
+        // ctx.closePath()
+        ctx.moveTo(100,150)
+        ctx.arc(100,150,30,0,Math.PI/2,false)
+        ctx.fill()
+        ctx.moveTo(150,150)
+        ctx.font = "bold 48px serif";
+        // ctx.textAlign = 'center'
+        // ctx.fillStyle ='orange'
+        ctx.strokeStyle ='blue'
+        ctx.scale(1,1)
+        ctx.strokeText('JetTsang',200,150)
+    </script>
+</body>
+</html>
