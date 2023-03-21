@@ -1,0 +1,158 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacBookPro芯片动效</title>
+    <script src="./03_source/gsap.min.js"></script>
+    <script src="./03_source/ScrollTrigger.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+        }
+
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            position: relative;
+            top: 500px;
+            padding: 5%;
+            background-image: url('./03_source/m2_bg__e4dkdscoyaaa_small_2x.jpg');
+        }
+
+        #container canvas {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body style="height: 3000px;">
+    <div id="app">
+        <div>
+            这是苹果官网的其他内容
+        </div>
+        <div id="container">
+            <canvas id="pro" width="308" height="308">
+                <div> 你的浏览器不支持Canvas！</div>
+            </canvas>
+            <canvas id="max" width="308" height="308">
+                <div> 你的浏览器不支持Canvas！</div>
+            </canvas>
+        </div>
+
+    </div>
+    <script>
+        (function(window,document){
+            // container距离视口顶部位置
+            const TOP = 15
+            const container = document.getElementById('container')
+            // 构建环境
+            // 利用gsap这个库控制滚动到经过盒子时，盒子悬浮在视口上
+            // 当滚动条滚动超过盒子的范围时，取消悬浮效果
+            // 注册ScrollTrigger插件
+            gsap.registerPlugin(ScrollTrigger);
+
+            gsap.to("#container", {
+                opacity: 1,
+                scrollTrigger: {
+                    trigger: "#container",
+                    duration: 2,
+                    start: `top ${TOP}px`, // 从盒子顶部15px处开始固定
+                    scrub: true, // 表示动画可以重复执行改成false表示只执行一次
+                    // markers: true, //  绘制开始位置和结束位置的线条
+                    pin: true, // 动画执行期间，页面不进行滚动，动画执行结束后
+                },
+            });
+
+            // 获取渲染上下文
+            const proCtx = document.getElementById('pro').getContext('2d')
+            const maxCtx = document.getElementById('max').getContext('2d')
+            // 加载资源到全局
+
+            // canvas 容器的宽高
+            const CANVAS_HEIGHT = 308
+            const TOTAL_PICS  = 52 // 总共的img、
+            // 存放Image对象
+            const IMG_MAP = {
+                max: new Array(TOTAL_PICS).fill(null),
+                pro: new Array(TOTAL_PICS).fill(null),
+            }
+
+            // 从静态资源当中引入图片，并且包装成Image对象
+            const loadImages = ()=>{
+                return new Promise((resolve,reject)=>{
+                    let count = 0
+                    for(let i = 0 ;i <=TOTAL_PICS ; i ++ ){
+                        const n = i < 10 ? `0${i}` : `${i}`
+                        const pro = new Image()
+                        pro.src =  `./03_source/m2pro/small_00${n}.jpg`
+                        const max = new Image()
+                        max.src =  `./03_source/m2max/small_00${n}.jpg`
+                        // 异步加载需要控制下
+                        pro.onload = ()=>{
+                            IMG_MAP.pro[i] = pro
+                            count ++ 
+                            if(count == 2*(TOTAL_PICS+1)){
+                                resolve()
+                            }
+                        }
+                        max.onload = ()=>{
+                            IMG_MAP.max[i] = max
+                            count ++ 
+                            if(count == 2*(TOTAL_PICS+1)){
+                                resolve()
+                            }
+                        }
+                        // 处理错误
+                        pro.onerror = max.onerror = ()=>{
+                            reject()
+                        }
+                    }
+                })
+            }
+            const renderImg = (index)=>{
+                if(index == undefined ) return 
+                if(IMG_MAP.pro[index]){
+                    proCtx.clearRect(0,0,CANVAS_HEIGHT,CANVAS_HEIGHT)
+                    proCtx.drawImage(IMG_MAP.pro[index],0,0)
+                }
+                if(IMG_MAP.max[index]){
+                    maxCtx.clearRect(0,0,CANVAS_HEIGHT,CANVAS_HEIGHT)
+                    maxCtx.drawImage(IMG_MAP.max[index],0,0)
+                }
+            }
+            // 记录下初次滑动到悬停位置
+            let firstScrollTop
+            const handleScroll = ()=>{
+                const top = container.getBoundingClientRect().top //
+                const height = container.getBoundingClientRect().height // 432
+                if(top === TOP){
+                    const scrollTop = document.body.scrollTop
+                    if(firstScrollTop == undefined){
+                        firstScrollTop = document.body.scrollTop
+                    }
+                    const percent = (scrollTop - firstScrollTop) / height
+                    const renderIndex = Math.ceil(percent * TOTAL_PICS)
+                    // 借助window.requestAnimationFrame来渲染 
+                    requestAnimationFrame(()=>{
+                        renderImg(renderIndex)
+                    })
+                }
+            }
+
+            loadImages().then(()=>{
+                console.log(IMG_MAP)
+                // 渲染第1桢
+                renderImg(0)
+                window.addEventListener('scroll',handleScroll)
+            })
+
+
+        })(window,document)
+    </script>
+</body>
+
+</html>
