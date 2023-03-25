@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 归并排序算法： 
+        // 分治 排序
+        function mergeSort(arr){
+            const length = arr.length
+            // 拆分的退出条件：只剩1个元素的时候，无需合并了
+            if(length <=1) return arr
+            const middle = Math.floor(length/2)
+            //  分片
+            const left = arr.slice(0,middle)
+            const right = arr.slice(middle)
+            // 不断合并原有的数组，直到回到 最上层 ，left right 一合并，return 合并后的数组，退出
+            return  merge(mergeSort(left) ,mergeSort(right))
+        }
+
+        function merge (left ,right){
+
+            const arr = []
+            while(left.length >0 && right.length >0){
+                if(left[0]> right[0]){
+                    arr.push(right.shift())
+                }else if (left[0] <= right[0]){
+                    arr.push(left.shift())
+                }
+            }
+
+
+            //  如果其中有一个有剩余，说明是规则之外的，直接放到最后即可
+            if(left.length>0){
+                arr.push(...left.slice())
+            }
+            if(right.length>0){
+                arr.push(...right.slice())
+            }
+            
+            return arr
+        }
+
+        
+
+        mergeSort([99,88,77,999,0])
+
+
+    </script>
+</body>
+</html>
