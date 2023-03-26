@@ -14,12 +14,13 @@
             var middleFn =function(n){
                 return add(m + n)
             }
-            middleFn.prototype.toString = function(){
+            middleFn.__proto__.toString = function(){
                 return m
             }
             return middleFn
         }
-        add(1)(2)(3)(4)
+        // 需要手动调用toString方法
+        add(1)(2)(3)(4).toString()
     </script>
 </body>
 </html>
