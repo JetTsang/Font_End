@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // navigator.connection
+        const connection = navigator.connection
+        onMounted(() => {
+            const effectiveType =  navigator.connection.effectiveType
+            switch (effectiveType) {
+                case '4g':
+                    // 加载高质量资源
+                    this.imgSrc = higherSrc
+                    break;
+                case '3g':
+                    // 加载稍低质量资源
+                    this.imgSrc = lowerSrc
+                    break;
+                case '2g':
+                    // ...
+                    break;
+            
+                default:
+                    //...
+
+                    break;
+            }
+        })
+        useEffect(()=>{
+            const effectiveType =  navigator.connection.effectiveType
+            switch (effectiveType) {
+                case '4g':
+                    // 加载高质量资源
+                    setImgsrc(higherSrc)
+                    break;
+                case '3g':
+                    // 加载稍低质量资源
+                    tsetImgsrc(lowerSrc)
+                    break;
+                case '2g':
+                    // ...
+                    break;
+            
+                default:
+                    //...
+
+                    break;
+            }
+        },[])
+    </script>
+</body>
+</html>
