@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // 定义一下基础数据对象
+        const obj = {
+            name: "Jettsang",
+            age: 25,
+            arr: [1, 2, 3],
+            msg: {
+                phoneCode: '12345678901',
+                address: '唐宁街10号'
+            }
+        }
+
+        /**
+         *  Vue 2 实现
+         * 
+        */
+        // vue 2 定义响应式，其实对defineProperty的封装
+        function defineReactive(target, key, value) {
+            // 对value进行递归定义响应式（如果value是对象的话）
+            observer(value)
+            Object.defineProperty(target, key, {
+                get() {
+                    return value
+                },
+                set(newVal) {
+                    if (value !== newVal) {
+                        value = newVal
+                        // 别忘了对新的值定义响应式，因为新的值可能是对象
+                        observer(newVal)
+                    }
+                }
+            })
+        }
+
+
+        const OVERRIDE_METHODS = ['push', 'pop', 'unshift', 'shift', 'reverse', 'sort', 'splice']
+
+        function setArrayProto(data) {
+            const prototype = Array.prototype
+            // 这里的create方法会将 newPrototype的原型指向prototype
+            // 因此通过原型链接仍然可以获取其他的Array原型方法
+            const newPrototype = Object.create(prototype)
+            OVERRIDE_METHODS.forEach(method=>{
+                newPrototype[method] = function(...args){
+                    // 这里可以加入响应式逻辑
+                    // 。。。
+                    // 注意this的指向,原型方法里要添加this才知道往哪里加
+                    prototype[method].call(this,...args)
+                    // prototype[method](...args)
+                }
+            })
+            data.__proto__ = newPrototype
+        }
+
+        function observer(data) {
+            if (typeof data !== 'object' || typeof data == null) {
+                return data
+            }
+            // 增加对数组的特殊处理
+            if (Array.isArray(data)) {
+                setArrayProto(data)
+                return 
+            }
+            // 这里是enumerable的
+            for (let key in data) {
+                // 定义响应式
+                defineReactive(data, key, data[key])
+            }
+        }
+        // observer(obj)
+        // console.log(obj);
+
+         /**
+         *  Vue 3 实现
+         * 
+        */
+
+        function reactive(target){
+            return new Proxy(target,{
+                get(target,key){
+                    
+                    const value =  target[key]
+                    // 如果是对象，需要代理该对象
+                    // 注意了，这里是触发getter才会去响应式，可以节省性能
+                    if(typeof value  =='object'){
+                        return reactive(value)
+                    }
+                    // 这里可以加收集依赖的逻辑了
+                    // 。。。
+                    return Reflect.get(target,key)
+                },
+                set(target,key,value){
+                    
+                    const oldValue = target[key]
+                    // 如果值不相等，才去设置
+                    if(oldValue !== value){
+                        Reflect.set(target,key,value)
+                    }
+                    // 触发副作用函数：比如刷新视图
+                    // 。。。
+                    return true
+                }
+            })
+        }
+        const proxyObj = reactive(obj)
+        console.log(proxyObj);
+    </script>
+</body>
+
+</html>
