@@ -9,10 +9,55 @@
 <body>
     <script>
 
+        // https://juejin.cn/post/6946022649768181774#heading-14
+
         // 1.类型判断
         function getType (data){
             return Object.prototype.toString.call(data).slice(8,-1)
         }
+
+        // 2.数组去重
+        // 核心思路：找到第一次出现的item
+        // 这里当然只针对基础类型
+        function unique(arr){
+            return arr.filter((value,index,arr)=>{
+                return arr.indexOf(value) === index
+            })
+            // 或者用es6的set数据结构
+            return Array.from(new Set(arr))
+        }
+
+        // 3. 数组扁平化
+        // [1,2,[3,4,[5]]] --> [1,2,3,4,5]
+        function flatArray(arr){
+            // 1. Array.prototype.flat 
+            return arr.flat(Infinity)
+            // 2. 递归 
+            // 这里的解除构，可以解除
+            while(arr.some(i=>Array.isArray(i))){
+                arr = [].concat(...arr)
+            }
+            return arr
+
+        }
+
+        // 4. 函数防抖
+        // 指定时间内只触发指定内容
+        function debounce(func,wait){
+            let timer = null
+            return function(...args){
+                // 注意这里的上下文
+                clearTimeout(timer)
+                timer = setTimeout(function(){
+                    console.log(this);
+                    func.apply(this,args)
+                    clearTimeout(timer)
+                    timer = null
+                },wait)
+            }
+        }
+
+
 
     </script>
 </body>
