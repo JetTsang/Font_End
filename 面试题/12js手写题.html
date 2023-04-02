@@ -84,6 +84,26 @@
             }
         }
 
+        // 6. 实现 new 关键字 
+        // new 关键字 主要做了3 件事
+        // 1. 构造函数的this指向对象
+        // 2. 设置对象示例的prototype为 Constructor.prototype -->  Constructor 和obj是构造关系
+        // 3. 如果构造函数有返回的对象，直接返回
+        function objectFactory(){
+            console.log(arguments);
+            const constructor = Array.prototype.shift.call(arguments) // 从参数里取出第一个入参（构造函数）
+            console.log(constructor);
+            console.dir(constructor);
+            console.log(arguments);
+            const obj = Object.create(constructor.prototype) // 建立原型上的联系
+            const ret = constructor.apply(obj,arguments) // 执行构造函数，并且接住构造函数返回的对象（若有的话）
+            return typeof  ret === 'object' ? (ret || obj) : obj
+        }
+        function Person(name,age){
+            this.name =name
+            this.age = age
+        }
+        console.log(objectFactory(Person,'Jettsang',25));
 
 
     </script>
