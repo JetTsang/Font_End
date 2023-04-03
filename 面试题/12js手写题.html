@@ -105,6 +105,21 @@
         }
         console.log(objectFactory(Person,'Jettsang',25));
 
+        // 7. 实现 [] instanceOf Array 
+        // 函数 instanceOf(left,right)  
+        // 判断 left instanceof right
+        function instanceOf(left,right){
+            // 拿到左边的原型
+            let proto = left.__proto__
+            while (true) {
+                // 到达原型链的终点,则为null（这里要注意用===来区分undefined和null）
+                if(proto === null) return false
+                if(proto === right.prototype) return true
+                // 继续更新原型
+                proto  = proto.__proto__
+            }
+        }
+
 
     </script>
 </body>
