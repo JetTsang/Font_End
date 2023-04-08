@@ -12,8 +12,13 @@
             return new Promise((resolve,reject)=>{
                 setTimeout(()=>{
                     console.log('请求结束'+url);
-                    // resolve()
-                    reject()
+                    if(Math.random() > 0.49){
+
+                        resolve('返回的url是：'+url)
+                    }else{
+
+                        reject('错误')
+                    }
                 },1000)
             })
         }
@@ -44,10 +49,101 @@
                 promise.then(clean,clean)
             }
             return Promise.allSettled(promises).then(callback)
-
+            
         }
-        sendRequest([1,2,3,4],1,(res)=>{
-            console.log(res);
+        // sendRequest([1,2,3,4],1,(res)=>{
+        //     console.log(res);
+        // })
+
+        // 解法2 
+
+        class Scheduler{
+            limit = 10 
+            queue = []
+            promiseList = null
+            concurrencyCount = 0 
+            fnRES_REj = new Map()
+            constructor(returnPromiseFn,limit){
+                this.limit = limit
+                this.queue.push(...returnPromiseFn)
+                this.wrapWithPromise()
+                // 全部执行 
+                this.allStart()
+            }
+
+
+            // 取到当前的可以开启的请求，
+            // 1. 如果 请求数量 >  限制数量   那么取限制数量，当请求结束后，再去请求剩下的数量，同样可以保证
+            // 2. 如果 请求数量 < 限制数量  那么直接取请求数量即可
+            // 3. 如果相等 ，任意一个无所谓 
+            // 可以会有疑问，如何保证能执行完全部的请求呢？
+            // 如果 请求数量少，则肯定能执行完  ，  因为  此时的请求数量，不会有多余的 
+            // 如果请求数量> ，则每个请求结束之后，则每一轮结束之后，都有 limit 个  请求数量 % limit = res  得到的结果res 必然 < limit 
+            allStart(){
+                const length = Math.min( this.queue.length,this.limit) //  取到最小的值，在finally下面一定可以循环全部的值
+                for(let i = 0 ;i < length ; i ++){
+                    this.start()
+                }
+            }
+            // 开始取出队列的内容并且进行执行 
+
+            start(){
+                if(this.limit <= this.concurrencyCount || this.queue.length <=0) return 
+                this.concurrencyCount +=1 
+                const thisPromise = this.queue.shift()
+                const {resolve,reject } = this.fnRES_REj.get(thisPromise)
+                // 从promise 里面取出  ，成功之后再resolve 
+                thisPromise && thisPromise()
+                .then(res=>{
+                    console.log('start里面的'+res);
+                    resolve&& resolve(res)
+                    return Promise.resolve(res)
+                }).catch(err=>
+                {
+                    reject&& reject(err)
+                    return Promise.reject(err)
+                })
+                
+                .finally(()=>{
+                    this.concurrencyCount -- 
+                    this.start()
+                })
+
+            }
+
+            // 想实现一个全部返回？ 
+
+            // 在之前就要建立好promise ,不能在finally里面再去给这个promise 里面添加 ，
+            allSettled(callback){
+                Promise.allSettled(this.promiseList).then(callback,callback)
+            }
+
+            // 因此需要一个函数去实现promise的包装 
+            wrapWithPromise(){
+                this.promiseList  = this.queue.map(fn=>{
+                    // return function(){
+                        return new Promise((resolve,reject)=>{
+                            this.setPromise(fn,resolve,reject)
+                        })
+                    // }
+                })
+            }
+            setPromise(fn,resolve,reject){
+                this.fnRES_REj.set(fn,{resolve,reject})
+            }
+        }
+
+
+        // 这里如果有配置then catch finall ，则会先走这里 ，后面的链式调用 ，则看这里的返回值  ， 如果这里没有配置，start里面配置了，
+        // 则会，取start里面配置的内容
+        new Scheduler([()=>request(1).then((res)=>{
+            console.log(res)
+            return res
+        }).catch(res=>console.log(res)),()=>request(2),()=>request(3).then((res)=>{
+            console.log(res)
+            return res
+        }),()=>request(4)],1).allSettled((err)=>{
+            console.log(err)
         })
 
     </script>
