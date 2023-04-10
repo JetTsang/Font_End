@@ -15,7 +15,7 @@
             ()=>request('2'),
             ()=>request('3'),
             ()=>request('4')],
-            2,
+            10,
             (res)=>{
                 console.log(res)
             }
@@ -33,15 +33,35 @@
                 },time*1e3)
             })
         }
+        async function a (){
+            try {
+                await request('22')
+                console.log('jieshu');
+            }finally{
+                console.log(111);
+            }
+        }
 
 
         // 解法1 
         function sendRequest(requestList,limits,callback){
-            const promises = requestList // 取得请求list
+            const promises = requestList.slice() // 取得请求list
             // 得到开始时，能执行的并发数
             const concurrentNum = Math.min(limits,requestList.length)
             let concurrentCount = 0 // 当前并发数
-            
+
+            const responsePromise = []
+            const taskPromiseResolve = new Map()
+            for(let request of requestList){
+                // responseList.set(request,null)
+                responsePromise.push(wrapeWithPromise(request))
+            }
+
+            function wrapeWithPromise  (task){
+                return new Promise(async (resolve)=>{
+                    taskPromiseResolve.set(task,resolve)
+                })
+            }
             // 第一次先跑起可以并发的任务
             const runTaskNeeded = ()=>{
                 let i = 0 
@@ -60,11 +80,16 @@
             // 跑任务
             // 执行任务，同时更新当前并发数
             const runner = async (task)=>{
+                const resolve = taskPromiseResolve.get(task)
                 try {
                     concurrentCount++
-                    await (async ()=>task())()
+                    const promise = task()
+                    resolve(promise)
+                    await promise
+                    // responseList.set(task,res)
                 } catch (error) {
-                    
+                    // console.log(error);
+                    // responseList.set(task,error)
                 }finally{
                     // 开启下一个任务
                     concurrentCount--
@@ -79,12 +104,13 @@
                     // 队列为空的时候，并且请求池清空了，就可以执行最后的函数了
                 }else if(promises.length ==0 && concurrentCount ==0 ){
                     // 执行结束
-                    callback && callback()
+                    // callback && callback(Array.from(responseList.values()))
                 }
             }
 
             // 入口执行
             runTaskNeeded()
+            return Promise.allSettled(responsePromise).then(callback,callback)
         }
 
 
