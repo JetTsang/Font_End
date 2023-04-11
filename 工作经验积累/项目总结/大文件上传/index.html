@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>文件md5</title>
+  <!-- 引入GO胶水 -->
+  <script src="./worker/wasm_exec.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/spark-md5/3.0.2/spark-md5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hash-wasm@4/dist/md5.umd.min.js"></script>
+</head>
+<body>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch('./static/md5.wasm'), go.importObject)
+      .then(res => {
+        go.run(res.instance);
+      });
+      const spark = new SparkMD5.ArrayBuffer()
+      let hasher
+      (async ()=>{
+        hasher = await hashwasm.createMD5()
+      })()
+  </script>
+  <input id="file" type="file" />
+  <button id="btn1">用wasm计算</button>
+  <button id="btn2">原生JS计算</button>
+  <button id="btn3">用wasm计算（分片）</button>
+  <button id="btn4">原生JS计算（分片）</button>
+  <button id="btn5">用hashwasm计算（分片）</button>
+  <br/>
+  <h3>js定时器渲染</h3>
+  <h5 id="h5"></h5>
+  <script>
+    const h5 = document.getElementById('h5')
+    let h5_COUNT = 0
+    setInterval(()=>{
+        h5.innerHTML = h5_COUNT
+        h5_COUNT++
+    },1000)
+  </script>
+  <script>
+    let file = null
+    const fileReader = new FileReader()
+    document.querySelector('#file').addEventListener('change', e => {
+      file = e.target.files[0];
+      console.log('size', file.size / 1024 / 1024 / 1024, "G")
+    });
+    function readFile(file,onload){
+        // fileReader.onprogress = e => {
+        //     console.log(`${Math.floor((e.loaded / e.total) * 100)}%`)
+        // }
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = onload
+    }
+
+    function sliceFile(file){
+        const ChunkSize = 128 * 1024 * 1024
+        const sliceedFileList = []
+        for(let i = 0 ;i<file.size;i+=ChunkSize){
+            sliceedFileList.push(file.slice(i,i+ChunkSize))
+        }
+        return sliceedFileList
+    }
+
+    
+
+    function calcMd5ByWASM(file){
+        const onload = e => {
+            console.time('【WASM】计算md5所需时间')
+            const bytes = new Uint8Array(e.target.result)
+            // wasmMd5Add(bytes)
+            // const md5Hash = wasmMd5End()
+            // 改用这个方法
+            const md5Hash = getFileMd5(bytes)
+            console.timeEnd('【WASM】计算md5所需时间')
+            console.log('md5', md5Hash)
+        }
+        readFile(file,onload)
+    }
+    function calcMd5ByJs(file){
+        const onload = e =>{
+            console.time('【SparkJs】计算md5所需时间')
+            spark.append(e.target.result) // 添加到spark算法中计算
+            const hash = spark.end() // 计算完成得到hash结果
+            console.timeEnd('【SparkJs】计算md5所需时间')
+            console.log('md5', hash)
+        }
+        readFile(file,onload)
+    }
+
+    function calcMd5ByWASMSlice(sliceedFileList,timeSTR){
+        const length = sliceedFileList.length
+        let count = 0 
+        const onload = e =>{
+            count ++
+            const bytes = new Uint8Array(e.target.result)
+            wasmMd5Add(bytes)
+            if(count == length){
+                const md5Hash = wasmMd5End()
+                console.timeEnd(timeSTR)
+                console.log('md5', md5Hash)
+            }else{
+                readFile(sliceedFileList[count],onload)
+            }
+        }
+        readFile(sliceedFileList[0],onload)
+    }
+    async function calcMd5ByHashWASMSlice(sliceedFileList,timeSTR){
+        const length = sliceedFileList.length
+        let count = 0 
+        if(hasher){
+            hasher.init()
+        }
+        const onload = e =>{
+            count ++
+            const bytes = new Uint8Array(e.target.result)
+            hasher.update(bytes)
+            if(count == length){
+                const md5Hash = hasher.digest()
+                console.timeEnd(timeSTR)
+                console.log('md5', md5Hash)
+            }else{
+                readFile(sliceedFileList[count],onload)
+            }
+        }
+        readFile(sliceedFileList[0],onload)
+    }
+    function calcMd5ByJsSlice(sliceedFileList,timeSTR){
+        const length = sliceedFileList.length
+        let count = 0 
+        const onload = e =>{
+            count ++
+            spark.append(e.target.result) // 添加到spark算法中计算
+            if(count == length){
+                const hash = spark.end() // 计算完成得到hash结果
+                console.timeEnd(timeSTR)
+                console.log('md5', hash)
+            }else{
+                readFile(sliceedFileList[count],onload)
+            }
+        }
+        readFile(sliceedFileList[0],onload)
+    }
+
+    document.getElementById('btn1').onclick = ()=>{
+        calcMd5ByWASM(file)
+    }
+    document.getElementById('btn2').onclick = ()=>{
+        calcMd5ByJs(file)
+    }
+    document.getElementById('btn3').onclick = ()=>{
+        const timeSTR = '【WASM】计算md5所需时间(分片)'
+        console.time(timeSTR)
+        const sliceedFileList = sliceFile(file)
+        calcMd5ByWASMSlice(sliceedFileList,timeSTR)
+    }
+    document.getElementById('btn4').onclick = ()=>{
+        const timeSTR = '【SparkJs】计算md5所需时间(分片)'
+        console.time(timeSTR)
+        const sliceedFileList = sliceFile(file)
+        calcMd5ByJsSlice(sliceedFileList,timeSTR)
+    }
+    document.getElementById('btn5').onclick = ()=>{
+        const timeSTR = '【HASHWASM】计算md5所需时间(分片)'
+        console.time(timeSTR)
+        const sliceedFileList = sliceFile(file)
+        calcMd5ByHashWASMSlice(sliceedFileList,timeSTR)
+    }
+  </script>
+</body>
+</html>
