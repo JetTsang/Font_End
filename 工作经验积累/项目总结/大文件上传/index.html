@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>文件md5</title>
   <!-- 引入GO胶水 -->
-  <script src="./worker/wasm_exec.js"></script>
+  <script src="./static/wasm_exec.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/spark-md5/3.0.2/spark-md5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hash-wasm@4/dist/md5.umd.min.js"></script>
 </head>
@@ -27,6 +27,8 @@
   <button id="btn3">用wasm计算（分片）</button>
   <button id="btn4">原生JS计算（分片）</button>
   <button id="btn5">用hashwasm计算（分片）</button>
+  <button id="btn6">用worker计算（分片）</button>
+  <button id="btn7">用worker+hasmwasm计算（分片）</button>
   <br/>
   <h3>js定时器渲染</h3>
   <h5 id="h5"></h5>
@@ -68,8 +70,7 @@
         const onload = e => {
             console.time('【WASM】计算md5所需时间')
             const bytes = new Uint8Array(e.target.result)
-            // wasmMd5Add(bytes)
-            // const md5Hash = wasmMd5End()
+            // wasmMd5Add
             // 改用这个方法
             const md5Hash = getFileMd5(bytes)
             console.timeEnd('【WASM】计算md5所需时间')
@@ -80,8 +81,8 @@
     function calcMd5ByJs(file){
         const onload = e =>{
             console.time('【SparkJs】计算md5所需时间')
-            spark.append(e.target.result) // 添加到spark算法中计算
-            const hash = spark.end() // 计算完成得到hash结果
+            spark.append(e.target.result)
+            const hash = spark.end() 
             console.timeEnd('【SparkJs】计算md5所需时间')
             console.log('md5', hash)
         }
@@ -165,6 +166,34 @@
         console.time(timeSTR)
         const sliceedFileList = sliceFile(file)
         calcMd5ByHashWASMSlice(sliceedFileList,timeSTR)
+    }
+    document.getElementById('btn6').onclick = ()=>{
+        const timeSTR = '【worker + SparkJs】计算md5所需时间(分片)'
+        console.time(timeSTR)
+        const sliceedFileList = sliceFile(file)
+        const worker = new Worker('./worker/jsCalc.js')
+        worker.postMessage({sliceedFileList})
+        worker.onerror = e=>{
+            console.log(e);
+        }
+        worker.onmessage = e=>{
+            console.timeEnd(timeSTR)
+            console.log('md5', e.data.hash)
+        }
+    }
+    document.getElementById('btn7').onclick = ()=>{
+        const timeSTR = '【worker + wasm】计算md5所需时间(分片)'
+        console.time(timeSTR)
+        const sliceedFileList = sliceFile(file)
+        const worker = new Worker('./worker/wasmCalc.js')
+        worker.postMessage({sliceedFileList})
+        worker.onerror = e=>{
+            console.log(e);
+        }
+        worker.onmessage = e=>{
+            console.timeEnd(timeSTR)
+            console.log('md5', e.data.hash)
+        }
     }
   </script>
 </body>
