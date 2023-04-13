@@ -11,9 +11,9 @@ async function calcMd5ByHashWASMSlice(sliceedFileList,callback){
         const onload = e =>{
             count ++
             const bytes = new Uint8Array(e.target.result)
-            wasmMd5Add(bytes)
+            wasmMd5Update(bytes)
             if(count == length){
-                const md5Hash = wasmMd5End()
+                const md5Hash = wasmMd5Digest()
                 callback(md5Hash)
             }else{
                 readFile(sliceedFileList[count],onload)
@@ -33,7 +33,7 @@ function readFile(file,onload){
 
 self.onmessage = (e)=>{
     const {sliceedFileList} = e.data
-    if(self.wasmMd5Add&&self.wasmMd5End){
+    if(self.wasmMd5Update&&self.wasmMd5Digest){
         console.log('wu');
         calcMd5ByHashWASMSlice(sliceedFileList,(hash)=>{
             self.postMessage({
@@ -41,7 +41,7 @@ self.onmessage = (e)=>{
             })
         })
     }else{
-        WebAssembly.instantiateStreaming(fetch('../static/md5.wasm'), go.importObject)
+        WebAssembly.instantiateStreaming(fetch('../static/GoMd5.wasm'), go.importObject)
         .then(res => {
             go.run(res.instance);
             calcMd5ByHashWASMSlice(sliceedFileList,(hash)=>{

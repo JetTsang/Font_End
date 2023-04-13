@@ -11,7 +11,7 @@
 <body>
   <script>
     const go = new Go();
-    WebAssembly.instantiateStreaming(fetch('./static/md5.wasm'), go.importObject)
+    WebAssembly.instantiateStreaming(fetch('./static/GoMd5.wasm'), go.importObject)
       .then(res => {
         go.run(res.instance);
       });
@@ -28,7 +28,8 @@
   <button id="btn4">原生JS计算（分片）</button>
   <button id="btn5">用hashwasm计算（分片）</button>
   <button id="btn6">用worker计算（分片）</button>
-  <button id="btn7">用worker+hasmwasm计算（分片）</button>
+  <button id="btn7">用worker+wasm计算（分片）</button>
+  <button id="btn8">用worker+hashwasm计算（分片）</button>
   <br/>
   <h3>js定时器渲染</h3>
   <h5 id="h5"></h5>
@@ -48,9 +49,6 @@
       console.log('size', file.size / 1024 / 1024 / 1024, "G")
     });
     function readFile(file,onload){
-        // fileReader.onprogress = e => {
-        //     console.log(`${Math.floor((e.loaded / e.total) * 100)}%`)
-        // }
         fileReader.readAsArrayBuffer(file);
         fileReader.onload = onload
     }
@@ -72,7 +70,7 @@
             const bytes = new Uint8Array(e.target.result)
             // wasmMd5Add
             // 改用这个方法
-            const md5Hash = getFileMd5(bytes)
+            const md5Hash = wasmCalcMd5(bytes)
             console.timeEnd('【WASM】计算md5所需时间')
             console.log('md5', md5Hash)
         }
@@ -95,9 +93,9 @@
         const onload = e =>{
             count ++
             const bytes = new Uint8Array(e.target.result)
-            wasmMd5Add(bytes)
+            wasmMd5Update(bytes)
             if(count == length){
-                const md5Hash = wasmMd5End()
+                const md5Hash = wasmMd5Digest()
                 console.timeEnd(timeSTR)
                 console.log('md5', md5Hash)
             }else{
@@ -186,6 +184,20 @@
         console.time(timeSTR)
         const sliceedFileList = sliceFile(file)
         const worker = new Worker('./worker/wasmCalc.js')
+        worker.postMessage({sliceedFileList})
+        worker.onerror = e=>{
+            console.log(e);
+        }
+        worker.onmessage = e=>{
+            console.timeEnd(timeSTR)
+            console.log('md5', e.data.hash)
+        }
+    }
+    document.getElementById('btn8').onclick = ()=>{
+        const timeSTR = '【worker + hashwasm】计算md5所需时间(分片)'
+        console.time(timeSTR)
+        const sliceedFileList = sliceFile(file)
+        const worker = new Worker('./worker/hashwasmCalc.js')
         worker.postMessage({sliceedFileList})
         worker.onerror = e=>{
             console.log(e);

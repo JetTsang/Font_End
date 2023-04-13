@@ -1,4 +1,4 @@
-self.importScripts('https://cdn.bootcdn.net/ajax/libs/spark-md5/3.0.2/spark-md5.min.js')
+self.importScripts('../static/spark-md5.min.js')
 const spark = new SparkMD5.ArrayBuffer()
 const fileReader = new FileReader()
 
