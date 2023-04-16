@@ -120,7 +120,68 @@
             }
         }
 
+        // 8. 实现深拷贝
+        // 1. win原生api
+        // window.structuredClone()
+        // 2. JSON重新生成
+        // JSON.parse(JSON.stringify()) 不能解决Date 和Function 以及循环引用 
+        // 3. 递归
+        // 判断类型 
+        const checkedType = (target) => Object.prototype.toString.call(target).replace(/\[object (\w+)\]/, "$1").toLowerCase();
+        function deepClone(target,weakMap=new WeakMap()){
+            let result 
+            const type = checkedType(target)
+            // 初始化result
+            if(type == 'object'){
+                result = {}
+            }else if(type == 'array'){
+                result = []
+            }else {
+                // 普通类型，则直接返回
+                return target
+            }
+            // 需要解决循环引用的问题
+            // 同级
+            // 父级  
+            // 相互
+            if(weakMap.get(target)) return target
+            
+            // 写法1
+            // weakMap.set(target,true)
+            // 写法2 
+            let copyObj = new target.constructor()
+            weakMap.set(target,copyObj)
+            // 遍历复制
+            for(let i in target){
+                const type = checkedType(target[i])
+                if(type == 'array' || type == 'object'){
+                    // 递归的时候，放入weakMap，用来判断是否有循环引用（之前以及引用过了）
+                    result[i] = deepClone(target[i],weakMap)
+                }else{
+                    result[i] = target[i]
+                }
+            }
+            return result
+        }
+        let obj = {
+            name: 'Jettsang'
+        }
+        obj.tempObj = obj
+        // 父级引用
 
+        // deepClone(obj)
+        const obj2 = {
+            name:'Jettsang',
+            family:{
+                name:"vannessa"
+            }
+        }
+        // 同级饮用
+        obj2.family.temp = obj2
+        // 相互引用
+        obj2.interObj = obj
+        obj.interObj = obj2
+        deepClone(obj)
     </script>
 </body>
 </html>
