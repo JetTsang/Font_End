@@ -182,6 +182,13 @@
         obj2.interObj = obj
         obj.interObj = obj2
         deepClone(obj)
+
+        // 9 找到数组中重复的元素
+        // 找到数组当中重复的[1,1,2,3,4,5,6,6] --> [1, 6]
+        function getRepeatItem (arr){
+            return arr.filter(i=>arr.indexOf(i)!==arr.lastIndexOf(i)).filter((item,index,thisArr)=>index == thisArr.indexOf(item))
+        }
+        getRepeatItem([1,1,2,3,4,5,6,6])
     </script>
 </body>
 </html>
