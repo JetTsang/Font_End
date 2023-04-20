@@ -13,7 +13,10 @@
 
         // 1.类型判断
         function getType (data){
-            return Object.prototype.toString.call(data).slice(8,-1)
+            // 写法1,利用slice的越界从后往前找
+            // return Object.prototype.toString.call(data).slice(8,-1)
+            // 写法2, 利用正则表达式
+            return Object.prototype.toString.call(data).replace(/\[object (\w*)\]/g,'$1')
         }
 
         // 2.数组去重
@@ -189,6 +192,8 @@
             return arr.filter(i=>arr.indexOf(i)!==arr.lastIndexOf(i)).filter((item,index,thisArr)=>index == thisArr.indexOf(item))
         }
         getRepeatItem([1,1,2,3,4,5,6,6])
+
+        // 10 数组去重
     </script>
 </body>
 </html>
