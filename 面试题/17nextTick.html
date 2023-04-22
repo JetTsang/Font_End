@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <span id="countDOM">
+            count:{{count}}
+        </span>
+        <br>
+        <button @click="handleClick">+100</button>
+    </div>
+    <script src="../dist/vue.js"></script>
+    <script>
+        new Vue({
+        name:"nextTick",
+        data:()=>({
+            count:0
+        }),
+        methods:{
+            handleClick(){
+                this.$nextTick(
+                    ()=>{
+                        const countDOM = document.getElementById('countDOM')
+                        console.log('-----修改前-----');
+                        console.log(
+                            countDOM.innerHTML
+                        );
+                    }
+                )
+                // 更新响应式数据
+                this.count += 100
+                this.$nextTick(
+                    ()=>{
+                        const countDOM = document.getElementById('countDOM')
+                        console.log('-----修改后-----');
+                        console.log(
+                            countDOM.innerHTML
+                        );
+                        this.count += 100
+                    }
+                )
+                this.$nextTick(
+                    ()=>{
+                        const countDOM = document.getElementById('countDOM')
+                        console.log('-----再次修改后-----');
+                        console.log(
+                            countDOM.innerHTML
+                        );
+                    }
+                )
+            }
+        }
+    }).$mount('#app')
+    </script>
+    
+</body>
+</html>
