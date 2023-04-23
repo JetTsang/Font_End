@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 有一堆请求，下一个请求需要上一个请求的返回结果作为入参
+        function request (arg,time=1){
+            return new Promise((resolve,reject)=>{
+                setTimeout(()=>{
+                    console.log('请求结束,入参是：'+arg);
+                    resolve('返回的结果:'+arg)
+                },Math.random()*1e3)
+            })
+        }
+        const requestList = [()=>request('首次入参'),
+        (arg)=>request(arg),
+        (arg)=>request(arg),
+        (arg)=>request(arg)]
+        const result = requestList.reduce(async (pre,i)=>{
+            let preReq
+            if(pre){
+                preReq = await pre // 这里是前一个async 函数，是一个promise，这个promise什么时候完成，取决于什么时候return ，
+                                    // 这里return的是await之后return 的值
+            }
+            const res = await i(preReq)
+            return res
+        },null)
+        async function testAsync (){
+            // const res = await request('测试啦啦啦')
+            // return res // 这里返回会结束promise
+            return '直接结束'
+        }
+        // console.log(
+            testAsync().then((res)=>console.log(res))
+        // )
+        // async 函数返回的是一个promise，函数体内return的东西，会结束这个promise，并且直接取出来放到then，跟await一样，会直接取值
+        // 如果也是一个promise，也是一样的道理
+    </script>
+</body>
+</html>
