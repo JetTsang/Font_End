@@ -221,6 +221,21 @@
             return sum;
         }
 
+        // 11 模拟setInterval 
+        function mySettimeout(fn, t) {
+        let timer = null;
+        function interval() {
+            fn();
+            timer = setTimeout(interval, t);
+        }
+        interval();
+        return {
+            cancel:()=>{
+            clearTimeout(timer)
+            }
+        }
+        }
+
     </script>
 </body>
 </html>
