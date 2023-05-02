@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .draggable-list-container{
+            margin: 60px auto;
+            width: 50%;
+        }
+        .draggable-list-container .draggable-ulList {
+            list-style: none;
+        }
+        .draggable-list-container .draggable-ulList {
+            border: 1px dashed red ;
+            padding: 0 16px;
+        }
+        
+        .draggable-list-container .draggable-ulList li .moveBtn {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: gray;
+            display: block;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+        }
+        .draggable-list-container .draggable-ulList li {
+            position: relative;
+            border: 1px solid blueviolet;
+            margin-bottom: 5px;
+            margin-top: 5px;
+            background-color: #fff;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            transition: all .2s;
+            opacity: 1;
+        }
+        /* 小技巧：用is选择器，可以选择确定的东西 */
+        /* .draggable-list-container .draggable-ulList li:is([data-id='3']) {} */
+        /* 用not选择器，可以选择非条件的东西 */
+        /* .draggable-list-container .draggable-ulList li:not([data-id='3']) { } */
+        /* 拖动时候的样式 */
+        .draggable-list-container .draggable-ulList .dragging{
+            opacity: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="draggable-list-container">
+        <ul class="draggable-ulList">
+        </ul>
+    </div>
+    <script>
+        ;(function(){
+            const dataList = 
+            [
+                {
+                    text: 'HTML',
+                    id: 1,
+                    order: 0
+                },
+                {
+                    text: 'CSS',
+                    id: 2,
+                    order: 1
+                },
+                {
+                    text: 'JavaScript',
+                    id: 3,
+                    order: 2
+                },
+                {
+                    text: 'React',
+                    id: 4,
+                    order: 3
+                },
+                {
+                    text: 'Vue',
+                    id: 5,
+                    order: 4
+                },
+                {
+                    text: 'Node',
+                    id: 6,
+                    order: 5
+                },
+                {
+                    text: 'Nest',
+                    id: 7,
+                    order: 6
+                },
+                {
+                    text: 'Next',
+                    id: 8,
+                    order: 7
+                },
+                {
+                    text: 'Angular',
+                    id: 9,
+                    order: 8
+                },
+                {
+                    text: 'Axios',
+                    id: 10,
+                    order: 9
+                },
+                {
+                    text: 'Babel',
+                    id: 11,
+                    order: 10
+                },
+                {
+                    text: 'Vite',
+                    id: 12,
+                    order: 11
+                },
+                {
+                    text: 'Webpack',
+                    id: 13,
+                    order: 12
+                },
+            ]
+            const oUl = document.querySelector('.draggable-ulList')
+            const oLis = []
+            const init = ()=>{
+                // 渲染
+                render()
+                // 绑定处理事件
+                bindEvent()
+            }
+            function render(){
+                const fragement = document.createDocumentFragment()
+                dataList.forEach(i=>{
+                    const oLi = document.createElement('li')
+                    oLi.setAttribute('draggable','false')
+                    oLi.setAttribute('data-id',i.id)
+                    oLi.setAttribute('data-order',i.order)
+                    oLi.innerText = i.text
+                    const oSpan = document.createElement('span')
+                    oSpan.classList.add('moveBtn')
+                    oLi.appendChild(oSpan)
+                    // oLi.innerHTML = `<div style="width:50%"/><span>${i.text}</span><div>`
+                    oLis.push(oLi)
+                    fragement.appendChild(oLi)
+                })
+                oUl.appendChild(fragement)
+            }
+            function bindEvent(){
+                //  dragestart dragend dragover 
+                //  drop 
+                oLis.forEach(i=>{
+                    i.addEventListener('dragstart',handleDragStart,false)
+                    i.addEventListener('dragend',handleDragEnd,false)
+                    // 会持续触发，拖动的元素在你上面则会触发
+                    // i.addEventListener('dragover',handleDragOver,false)
+                    oUl.addEventListener('dragover',handleDragOver,false)
+                    // i.addEventListener('mouseup',(e)=>{
+                    //     console.log('up');
+                    //     oUl.querySelectorAll('li').forEach(i=>{
+                    //         i.setAttribute('draggable','false')
+                    //     })
+                    // },false)
+
+                    // 不会持续触发，拖动的元素在此元素上面，则触发一次
+                    // i.addEventListener('dragenter',handleDragEnter,false)
+                    i.addEventListener('drop',handleDrop,false)
+                })
+                document.querySelectorAll('.moveBtn').forEach(i=>{
+                    i.addEventListener('mousedown',(e)=>{
+                        // 动态控制draggable即可
+                        const parentLi = e.target.parentNode
+                        parentLi.setAttribute('draggable','true')
+                    },false)
+                })
+                // document.addEventListener('dragend',e=>e.preventDefault(),false)
+                document.addEventListener('dragover',e=>e.preventDefault(),false)
+            }
+            let oDraggingElement = null
+            function handleDragStart(e){
+                // e.preventDefault();
+                console.log('---- handleDragStart ----');
+                console.log(e.target.getAttribute('data-id'),e);
+                // 添加拖动中的样式
+                setTimeout(()=>{
+                    e.target.classList.add('dragging')
+                })
+                oDraggingElement = e.target
+            }
+            function handleDragEnd(e){
+                e.preventDefault();
+                console.log('---- handleDragEnd ----');
+                console.log(e.target.getAttribute('data-id'),e);
+                // 移除拖动中的样式
+                setTimeout(()=>{
+                    e.target.classList.remove('dragging')
+                })
+                oDraggingElement = null
+            }
+            function handleDragOver(e){
+                if(!e.target.getAttribute('data-id')) return 
+                // 阻止默认事件，效果：
+                // 会出现+号鼠标
+                // 不会出现，自动归位时候的样式消失问题
+                e.preventDefault();
+                console.log('---- handleDragOver ----');
+                const oSiblingElement = e.target // 当前触发元素
+                // 当前触发的target和拖动的同一个，return 
+                if(e.target == oDraggingElement) return 
+                // 上半部分
+                if((oSiblingElement.offsetTop+oSiblingElement.offsetHeight/2) > e.pageY){
+                    oSiblingElement.before(oDraggingElement)
+                }else{
+                    // 下半部分
+                    // 上半部分，则插入到此元素的上方
+                    oSiblingElement.after(oDraggingElement)
+                }
+            }
+
+            function handleDragEnter(e){
+                e.preventDefault();
+                console.log('---- handleDragEnter ----');
+                console.log(e.target.getAttribute('data-id'),e);
+                console.log(this);
+            }
+            function handleDrop(e){
+                e.preventDefault();
+                console.log('---- handleDrop ----');
+                oUl.querySelectorAll('li').forEach(i=>{
+                    i.setAttribute('draggable','false')
+                })
+            }
+            // 初始化
+            init()
+        })()
+    </script>
+</body>
+</html>
