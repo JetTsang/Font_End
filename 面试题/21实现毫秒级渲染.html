@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h3 id="h3"></h3>
+    <script>
+      // 实现毫秒级渲染,使用hooks封装
+
+      // 思路：
+      // 给定一个结束的时间，设定为剩余时间
+      // start pause reset 三个功能函数 ， pause 之后可以start
+      // 关系表达式 ：
+      // 剩余时间 = 给定的原始值  -  流逝的时间
+      //  流逝的时间 =  performance.now() 后 - performance.now() 前（开始倒计时的时候）
+      //  结合起来 剩余时间 = 给定的时间 + performance.now() 前   - performance.now() 后
+      //  运算时机：  在 requesetAnimateFrame 的回调里面，获取当前最新的 剩余时间
+
+      // 设计 ：
+      //  变量 ：
+      // endTimeStamp 结束的时间戳： 为 剩余时间（初始化的时候为给定的时间） + performance.now() 前
+      // currentRemainTime 剩余时间（当前）
+      // isCounting  是否正在倒计时  ， 用于在raf的回调里面控制倒计时
+      //    rafId   当前 raf返回的id，用于后续取消
+      //  方法：
+      //  start ： 使用场景 暂停之后start / 直接start  ， isCounting ： 不执行， 设置当前的结束时间戳，去流逝
+      //  pause ： 场景： 用来暂停    取消raf isCounting false
+      //  reset :  重新设置 剩余时间 + 暂停
+      //  getRemainTime : 拿到当前执行时候到剩余时间
+      //  tick : 倒计时执行 ： isCounting , 是否毫秒级渲染
+      //   micro : marco :  isCounting  ｜  设置id 并且 raf执行 ｜  更新剩余时间
+      //  setCurrentTime ：格式化剩余时间 为： 可用的时间
+      // isSameSecond ： 通过此剩余时间，判断是否为同一秒
+      function usemilliSecondRender({ time, dom, isMillisecond }) {
+        let remainTime; // 当前剩余时间 (给定的时间，减去流逝的时间)  初始等于 给定的total 时间
+        // endTime  = remainTime  + performance.now()
+        let endTime; // 结束的时间戳（加上当前时间戳）通过后续的- performance.now()得出时间
+        let rafId = -1; // raf的id
+        let isCounting = false; // 标志执行中
+        let currentTime = {
+          total: "",
+          days: "",
+          hours: "",
+          minutes: "",
+          seconds: "",
+          milliSeconds: "",
+        };
+
+        const raf = (cb) => {
+          return window.requestAnimationFrame(cb);
+        };
+        const cancelRaf = () => {
+          window.cancelAnimationFrame(rafId);
+        };
+
+        // 当前在倒计时当中，不会重新设置结束时候的时间搓
+        const start = () => {
+          if (isCounting) return;
+          // 更新结束的时间戳
+          endTime = performance.now() + remainTime;
+          ticking();
+        };
+
+        const pause = () => {
+          isCounting = false;
+          //  取消掉没用的raf
+          cancelRaf();
+        };
+
+        // 重新设置
+        const reset = (time) => {
+          pause();
+          remainTime = time;
+        };
+
+        // 时间开始走
+        const ticking = () => {
+          isCounting = true;
+          if (isMillisecond) {
+            runMicro();
+          } else {
+            runMarco();
+          }
+        };
+
+        // 毫秒级渲染
+
+        const runMicro = () => {
+          // 在倒计时的时候，才需要去运算
+          if (isCounting) {
+            // 算出currentTime
+            const timeRemainTime = getRemainTime();
+
+            // 修改剩余时间
+            remainTime = timeRemainTime;
+            // 修改此时的currentTime
+            setCurrentTime(remainTime);
+            setDom();
+            if (remainTime == 0) return;
+            //继续下一次渲染，并且更新rafId方便后续取消
+            rafId = raf(runMicro);
+          }
+        };
+
+        // 秒级渲染，核心代码是判定是否同一秒
+        const runMarco = () => {
+          if (isCounting) {
+            const timeRemainTime = getRemainTime();
+            // 算出currentTime
+            remainTime = timeRemainTime;
+            // 不是同一秒才执行
+            if (!isSameSecond(timeRemainTime, remainTime)) {
+              setCurrentTime(timeRemainTime);
+              setDom();
+            }
+
+            if (remainTime == 0) return;
+            //继续下一次渲染，并且更新rafId方便后续取消
+            rafId = raf(runMarco);
+          }
+        };
+
+        // 通过当前剩余的时间戳，转换成对应的格式
+        const setCurrentTime = (timeStamp) => {
+          const Second = 1000;
+          const Minute = 60 * Second;
+          const Hour = 60 * Minute;
+          const Day = 24 * Hour;
+          currentTime = {
+            total: timeStamp,
+            days: Math.floor(timeStamp / Day),
+            hours: Math.floor((timeStamp % Day) / Hour),
+            minutes: Math.floor((timeStamp % Hour) / Minute),
+            seconds: Math.floor((timeStamp % Minute) / Second),
+            milliSeconds: Math.floor(timeStamp % Second),
+          };
+        };
+
+        // 返回剩余的时间 （毫秒）
+        const getRemainTime = () => {
+          return Math.max(endTime - performance.now(), 0);
+        };
+
+        // 是否同一秒
+        const isSameSecond = (time1, time2) => {
+          return Math.floor(time1 / 1000) === Math.floor(time2 / 1000);
+        };
+
+        // 调用渲染
+        const setDom = () => {
+          if (dom) {
+            dom.innerHTML = `${currentTime.seconds}秒:${padZero(
+              currentTime.milliSeconds,
+              3
+            )}毫秒`;
+          }
+        };
+
+        //  在前面加0
+        const padZero = (str, length = 2) => {
+          let temp = str + "";
+          return temp.padStart(length, "0");
+        };
+
+        return {
+          start,
+          pause,
+          reset,
+          currentTime,
+        };
+      }
+
+      // 测试代码
+      const { start, pause, reset, currentTime } = usemilliSecondRender({
+        time: 60 * 1000,
+        dom: document.getElementById("h3"),
+        isMillisecond: false,
+      });
+      reset(10 * 1000);
+      start();
+      setTimeout(() => {
+        console.log("停止");
+        pause();
+      }, 2000);
+      setTimeout(() => {
+        console.log("开始");
+        start();
+      }, 7000);
+      setTimeout(() => {
+        console.log("开始");
+        reset(60 * 1000);
+      }, 1000);
+    </script>
+  </body>
+</html>
