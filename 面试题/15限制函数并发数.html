@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 题目
+        // countLimit 是一个函数，执行fn，执行的并发度是 2，返回一个 Promise
+        let countLimit = pLimit( 1)
+        let a = countLimit(()=>{
+            return new Promise(resolve=>{
+            
+            setTimeout(()=>{
+                resolve()
+            },1000)
+            })
+        }) // 立即执行
+        countLimit(()=>{
+            return new Promise(resolve=>{
+            setTimeout(()=>{
+
+                console.log('b')
+                resolve()
+                },1000)
+            })
+        
+        }) // 立即执行
+        countLimit(()=>{
+            return new Promise(resolve=>{
+
+                setTimeout(()=>{
+    
+                resolve()
+                },1000)
+            })
+        }) // 执行完ab再执行
+
+        // 求实现函数 pLimit
+        function pLimit(limit){
+            let timer = null
+            const fnQueue = []
+            let count = 0 
+            const collectFn = function(fn,...args){
+                return new Promise((resolve)=>{
+                    const task = runTask.bind(null,fn,resolve,args)
+                    fnQueue.push(task)
+                    runner()
+                    
+                })
+            }
+            async function runTask(fn,resolve,args){
+                    try {
+                        
+                        count ++ 
+
+                        const res = await fn(...args)
+                        console.log(res);
+                    } finally {
+                        
+                        count --
+                        resolve()
+                        next()
+                    }
+            }
+
+            const runner = ()=>{
+                if(timer) {
+                    clearTimeout(timer)
+                    timer = null
+                }
+                timer = setTimeout(()=>{
+                    for(let i of fnQueue){
+                        if(count < limit){
+
+                            fnQueue.shift()()
+                        }
+                    }
+                })
+            }
+            const next = ()=>{
+                // 取出promise执行
+                if(count<limit && fnQueue.length>0){
+                    fnQueue.shift()()
+                }
+            }
+            return collectFn
+        }
+    </script>
+</body>
+</html>
