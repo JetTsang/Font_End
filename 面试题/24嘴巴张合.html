@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嘴巴张合</title>
+
+</head>
+<body>
+    <div class="container"
+    >
+    <div class="wrapper">
+        <div class="upper"></div>
+        <div class="downer"></div>
+    </div>
+    </div>
+   
+    <style>
+        body { 
+            --haha-width:120px;
+            --haha-height:60px;
+            --rotate-deg:50deg;
+            --rotate-deg-minus:-50deg
+        }
+        .container{
+            width: 100%;
+            height: 100vh;
+            background-color: skyblue;
+        }
+        .upper,.downer {
+            height: var(--haha-height);
+            width: var(--haha-width);
+            background-color: blueviolet;
+            
+        }
+        /* 
+            使用百分比作为宽高
+        　　如果宽高不一致，那产生的效果，
+            其实就是以对象的宽高乘以百分数后得到的值r1和r2，
+            作为两条半径绘制出来的椭圆产生的弧度。
+        */
+        /* 做一个半圆 */
+        .downer{
+            /* 左上 右上 右下 左下 */
+            border-radius: 0 0 calc(var(--haha-height)) calc(var(--haha-height)); 
+            /* border-radius: 0 0 7px 7px;  */
+            transform-origin: center top;
+        }
+        .upper{
+            /* 左上 右上 右下 左下 */
+            /* background-color: violet; */
+            border-radius: calc(var(--haha-height)) calc(var(--haha-height))0 0 ; 
+            /* 设置旋转中心点 横向中间，纵向底部 */
+            transform-origin: center bottom;
+        }
+        /* 动画，去转动盒子 */
+        .wrapper:hover .downer{ 
+            /* transform: rotate(var(--rotate-deg)); */
+            animation: haha-moving-down .8s;
+        }
+        .wrapper:hover .upper{ 
+            animation: haha-moving-upper .8s;
+        }
+        @keyframes haha-moving-down {
+            0% {
+                transform:rotate(0);
+            }
+            25% {
+                transform: rotate(var(--rotate-deg));
+            }
+            50%{
+                transform:rotate(0);
+            }
+            75% {
+                transform: rotate(var(--rotate-deg));
+            }
+            100% {
+                transform:rotate(0);
+            }
+        }
+        @keyframes haha-moving-upper {
+            0% {
+                transform:rotate(0);
+            }
+            25% {
+                transform: rotate(var(--rotate-deg-minus));
+            }
+            50%{
+                transform:rotate(0);
+            }
+            75% {
+                transform: rotate(var(--rotate-deg-minus));
+            }
+            100% {
+                transform:rotate(0);
+            }
+        }
+    </style>
+    <script>
+
+    </script>
+</body>
+</html>
