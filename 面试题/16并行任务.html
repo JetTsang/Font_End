@@ -15,7 +15,7 @@
             ()=>request('2'),
             ()=>request('3'),
             ()=>request('4')],
-            1,
+            10,
             (res)=>{
                 console.log(res)
             },
@@ -26,11 +26,11 @@
             return new Promise((resolve,reject)=>{
                 setTimeout(()=>{
                     console.log('请求结束：'+url);
-                    // if(Math.random() > 0.5){
-                    //     resolve('成功:'+url)
-                    // }else{
+                    if(Math.random() > 0.5){
+                        resolve('成功:'+url)
+                    }else{
                         reject('错误:'+url)
-                    // }
+                    }
                 },time*1e3)
             })
         }
@@ -152,83 +152,201 @@
         
 
         // 扩展： 提供错误重试的功能
-        function sendRequest (requestList,limits,callback,maxTryTimes=3){
-            requestPromise = []
-            requestWrappers = []
-            concurrentIndex = 0 // 当前并发标记
+        // function sendRequest (requestList,limits,callback,maxTryTimes=3){
+        //     requestPromise = []
+        //     requestWrappers = []
+        //     concurrentIndex = 0 // 当前并发标记
 
-            // 将list包裹成promise
-            const init = ()=>{
-                for(const item of requestList){
-                    requestPromise.push(wrapeWithPromise(item))
-                }
-                // 执行
-                runTask()
-            }
+        //     // 将list包裹成promise
+        //     const init = ()=>{
+        //         for(const item of requestList){
+        //             requestPromise.push(wrapeWithPromise(item))
+        //         }
+        //         // 执行
+        //         runTask()
+        //     }
 
-            init()
+        //     init()
 
-            function wrapeWithPromise(requestItem){
-                return new Promise((resolve,reject)=>{
-                    requestWrappers.push(  {
-                            request:requestItem,
-                            resolve,
-                            reject,
-                            remainRetryTimes:maxTryTimes
-                        }
-                    )
-                })
-            }
+        //     function wrapeWithPromise(requestItem){
+        //         return new Promise((resolve,reject)=>{
+        //             requestWrappers.push(  {
+        //                     request:requestItem,
+        //                     resolve,
+        //                     reject,
+        //                     remainRetryTimes:maxTryTimes
+        //                 }
+        //             )
+        //         })
+        //     }
 
-            function runTask (){
-                // 取出来执行
-                const beginTask = Math.min(limits,requestList.length)
+        //     function runTask (){
+        //         // 取出来执行
+        //         const beginTask = Math.min(limits,requestList.length)
 
-                for(let i = 0 ;i < beginTask; i++ ){
-                    runner(requestWrappers[i])
-                }
-                // 清掉
-                requestWrappers.splice(0,beginTask) 
-            }
+        //         for(let i = 0 ;i < beginTask; i++ ){
+        //             runner(requestWrappers[i])
+        //         }
+        //         // 清掉
+        //         requestWrappers.splice(0,beginTask) 
+        //     }
 
-            function runner (wrapePromise){
-                const  {
-                            request,
-                            resolve,
-                            reject,
-                            remainRetryTimes
-                        }  = wrapePromise
+        //     function runner (wrapePromise){
+        //         const  {
+        //                     request,
+        //                     resolve,
+        //                     reject,
+        //                     remainRetryTimes
+        //                 }  = wrapePromise
                 
-                concurrentIndex ++ 
+        //         concurrentIndex ++ 
 
-                const callback = (res)=>{
-                    concurrentIndex -- 
+        //         const callback = (res)=>{
+        //             concurrentIndex -- 
+        //             resolve(res)
+        //             continueRun()
+        //         }
+        //         const continueRun = ()=>{
+        //             if(concurrentIndex < limits && requestWrappers.length >0){
+        //                 runner(requestWrappers.shift())
+        //             }
+        //         }
+        //         const failCallback = (err)=>{
+        //             concurrentIndex -- 
+        //             if(remainRetryTimes !== 0){
+        //                 // 重试
+        //                 wrapePromise.remainRetryTimes -- 
+        //                 requestWrappers.push(wrapePromise)
+        //             }else {
+        //                 // 结束
+        //                 reject(err)
+        //             }
+        //             continueRun()
+        //         }
+        //         request().then(callback,failCallback)
+        //     }
+
+
+        //     Promise.allSettled(requestPromise).then(callback,callback)
+        // }
+        // for await of 
+        // for await (let i of promises){  }
+
+        // for of / for  里面使用await 则也会等待一个接一个
+
+        function sendRequest(requestList, limits, callback, retryTimes) {
+            // 定义执行队列，表示所有待执行的任务
+            const requestListWrapperedQueue = []; 
+            // 定义开始时能执行的并发数
+            const concurrentNum = Math.min(limits, requestList.length);
+            // 定义放在allSettled的所有promise
+            const returnPromises = [];
+
+            // 当前并发数
+            let concurrentCount = 0; 
+            
+            
+
+            // 新增： 包裹promise,并且将相关信息重新包装放入请求队列
+            const wrapePromise = (requestItem)=>{
+                return new Promise((resolve,reject)=>{
+                    requestListWrapperedQueue.push({
+                        requestFn:requestItem,      
+                        resolve,
+                        reject,
+                        remainRetryTime:retryTimes // 剩余重试次数
+                    })
+                })
+            };
+
+            // 启动初次能执行的任务
+            const runTaskNeeded = () => {
+                let i = 0 
+                // 启动当前的任务
+                while(i < concurrentNum){
+                    i++
+                    runTask()
+                }
+            }; 
+            
+            // 取出任务并推送到执行器
+            const runTask = () => {
+                // 从任务队列里取出任务
+                const task = requestListWrapperedQueue.shift()
+                task && runner(task)
+            };
+
+            // 执行器，这里去执行任务
+            const runner = async (task) => {
+                const  {
+                    requestFn,      
+                    resolve,
+                    reject,
+                    remainRetryTime
+                       } = task;
+                
+                try {
+
+                    // 并发数 +1
+                    concurrentCount++
+
+                    // 执行任务
+                    const res = await requestFn()
+
                     resolve(res)
-                    continueRun()
-                }
-                const continueRun = ()=>{
-                    if(concurrentIndex < limits && requestWrappers.length >0){
-                        runner(requestWrappers.shift())
-                    }
-                }
-                const failCallback = (err)=>{
-                    concurrentIndex -- 
-                    if(remainRetryTimes !== 0){
-                        // 重试
-                        wrapePromise.remainRetryTimes -- 
-                        requestWrappers.push(wrapePromise)
+                } catch (error) {
+                    // 判断还有无重试次数
+                    if(remainRetryTime > 0){
+
+                        // 重新放回队列
+                        requestListWrapperedQueue.push(task)
+
+                        // 剩余重试次数-1
+                        task.remainRetryTime --
+
                     }else {
-                        // 结束
-                        reject(err)
+
+                        // 没有剩余次数则直接结束
+                        reject(error)
                     }
-                    continueRun()
+            
+                }finally{
+
+                    // 并发数-1
+                    concurrentCount--
+                    // 捞起下一个任务
+                    picker()
+
                 }
-                request().then(callback,failCallback)
+            };
+            // 捞起下一个任务
+            const picker = () => {
+                if(concurrentCount < limits && requestListWrapperedQueue.length > 0 ){
+                    // 继续执行任务
+                    runTask()
+                }
+            };
+
+             // 新增： 初始化，构建执行队列以及包裹promise
+            const init = ()=>{
+                for(let requestItem of requestList){
+                    const wrapperedPromise = wrapePromise(requestItem)
+                    returnPromises.push(wrapperedPromise)
+                }
+            }
+            
+            // 开始执行函数
+            const start = ()=>{
+                init()
+                runTaskNeeded()
             }
 
+            // 开始
+            start()
 
-            Promise.allSettled(requestPromise).then(callback,callback)
-        }
+            // 新增： 
+            Promise.allSettled(returnPromises).then(callback,callback)
+      }
     </script>
 </body>
 </html>
