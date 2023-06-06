@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>25路由列表转菜单</title>
+  </head>
+  <body>
+    <script>
+      const arr = [
+        {
+          name: "客户系统",
+          routes: [
+            {
+              name: "首页",
+              path: "/merchant/home",
+            },
+            {
+              name: "基础配置",
+              routes: [
+                {
+                  name: "客户等级",
+                  path: "/merchant/baseConfigure/level",
+                },
+                {
+                  name: "客户管理",
+                  path: "/merchant/baseConfigure/customerManagement",
+                },
+                {
+                  name: "组织架构",
+                  path: "/merchant/baseConfigure/organization",
+                },
+              ],
+            },
+            {
+              name: "产品配置",
+              routes: [
+                {
+                  name: "属性配置",
+                  path: "/merchant/productConfigure/attributeConfigure",
+                },
+                {
+                  name: "故障管理",
+                  path: "/merchant/productConfigure/faultManagement",
+                },
+              ],
+            },
+            {
+              name: "财务配置",
+              routes: [
+                {
+                  name: "服务价格",
+                  path: "/merchant/financeConfigure/servicePrice",
+                },
+                {
+                  name: "返利配置",
+                  path: "/merchant/financeConfigure/rebateConfigure",
+                },
+                {
+                  name: "额度申请",
+                  path: "/merchant/financeConfigure/applicationQuota",
+                },
+                {
+                  name: "充值配置",
+                  path: "/merchant/financeConfigure/rechargeConfiguration",
+                },
+              ],
+            },
+            {
+              name: "B2B管理",
+              routes: [
+                {
+                  name: "店铺管理",
+                  path: "/merchant/b2b/shop",
+                },
+                {
+                  name: "服务类型",
+                  path: "/merchant/b2b/serviceType",
+                },
+                {
+                  name: "客户产品",
+                  path: "/merchant/b2b/product",
+                },
+                {
+                  name: "质保类型",
+                  path: "/merchant/b2b/warrantyType",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "网点系统",
+          routes: [
+            {
+              name: "首页",
+              path: "/serviceStation/home",
+            },
+            {
+              name: "基础配置",
+              routes: [
+                {
+                  name: "网点管理",
+                  path: "/serviceStation/baseConfigure/stationManagement",
+                },
+                {
+                  name: "质保等级",
+                  path: "/serviceStation/baseConfigure/warrantyDepositLevel",
+                },
+                {
+                  name: "积分规则",
+                  path: "/serviceStation/baseConfigure/scoreRule",
+                },
+                {
+                  name: "组织架构",
+                  path: "/serviceStation/baseConfigure/organization",
+                },
+              ],
+            },
+            {
+              name: "财务配置",
+              routes: [
+                {
+                  name: "服务价格",
+                  path: "/serviceStation/financeConfigure/servicePrice",
+                },
+                {
+                  name: "时效奖励",
+                  path: "/serviceStation/financeConfigure/timelinessReward",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "后台管理系统",
+          routes: [
+            {
+              name: "首页",
+              path: "/platform/home",
+            },
+            {
+              name: "基础配置",
+              path: "",
+              routes: [
+                {
+                  name: "区域管理",
+                  path: "/platform/baseConfigure/region",
+                },
+                {
+                  name: "协议配置",
+                  path: "/platform/baseConfigure/protocolConfigure",
+                },
+                {
+                  name: "协议档案",
+                  path: "/platform/baseConfigure/protocolDocument",
+                },
+                {
+                  name: "问卷模板",
+                  path: "/platform/baseConfigure/questionnaireTemplate",
+                },
+                {
+                  name: "组织架构",
+                  path: "/platform/baseConfigure/organization",
+                },
+                {
+                  name: "题目管理",
+                  path: "/platform/baseConfigure/examination",
+                },
+                {
+                  name: "试卷管理",
+                  path: "/platform/baseConfigure/examinationPaper",
+                },
+              ],
+            },
+            {
+              name: "服务配置",
+              routes: [
+                {
+                  name: "投诉判责",
+                  path: "/platform/serviceConfigure/complainJudge",
+                },
+                {
+                  name: "单据节点",
+                  path: "/platform/serviceConfigure/orderNode",
+                },
+                {
+                  name: "照片模板",
+                  path: "/platform/serviceConfigure/photoTemplate",
+                },
+                {
+                  name: "服务体系",
+                  path: "/platform/serviceConfigure/serviceSystem",
+                },
+                {
+                  name: "服务类型",
+                  path: "/platform/serviceConfigure/serviceType",
+                },
+                {
+                  name: "跟踪进度",
+                  path: "/platform/serviceConfigure/trackProgress",
+                },
+                {
+                  name: "辅材项目",
+                  path: "/platform/serviceConfigure/material",
+                },
+              ],
+            },
+            {
+              name: "产品配置",
+              routes: [
+                {
+                  name: "产品分类",
+                  path: "/platform/productConfigure/productCategory",
+                },
+                {
+                  name: "属性配置",
+                  path: "/platform/productConfigure/attributeConfigure",
+                },
+                {
+                  name: "产品管理",
+                  path: "/platform/productConfigure/productManagement",
+                },
+                {
+                  name: "配件管理",
+                  path: "/platform/productConfigure/partsManagement",
+                },
+                {
+                  name: "故障管理",
+                  path: "/platform/productConfigure/faultManagement",
+                },
+              ],
+            },
+            {
+              name: "财务配置",
+              routes: [
+                {
+                  name: "参考价格",
+                  path: "/platform/financeConfigure/referencePrice",
+                },
+                {
+                  name: "互助基金",
+                  path: "/platform/financeConfigure/referencePrice",
+                },
+              ],
+            },
+            {
+              name: "设置中心",
+              routes: [
+                {
+                  name: "系统设置",
+                  routes: [
+                    {
+                      name: "系统管理",
+                      path: "/platform/systemConfigure/system/subSystem",
+                    },
+                    {
+                      name: "授权管理",
+                      path: "/platform/systemConfigure/system/auth",
+                    },
+                    {
+                      name: "序号管理",
+                      path: "/platform/systemConfigure/system/serialNumber",
+                    },
+                    {
+                      name: "令牌管理",
+                      path: "/platform/systemConfigure/system/token",
+                    },
+                    {
+                      name: "任务管理",
+                      path: "/platform/systemConfigure/system/task",
+                    },
+                    {
+                      name: "消息处理",
+                      path: "/platform/systemConfigure/system/message",
+                    },
+                    {
+                      name: "队列管理",
+                      path: "/platform/systemConfigure/system/queue",
+                    },
+                    {
+                      name: "系统日志",
+                      path: "/platform/systemConfigure/system/log",
+                    },
+                    {
+                      name: "消息模板",
+                      path: "/platform/systemConfigure/system/messageTemplate",
+                    },
+                  ],
+                },
+                {
+                  name: "字典管理",
+                  path: "/platform/systemConfigure/dictionary",
+                },
+                {
+                  name: "菜单管理",
+                  path: "/platform/systemConfigure/menu",
+                },
+                {
+                  name: "角色管理",
+                  path: "/platform/systemConfigure/role",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: "公司官网",
+          routes: [
+            {
+              name: "首页",
+              path: "/site/home",
+            },
+            {
+              name: "图片管理",
+              path: "/site/picture",
+            },
+            {
+              name: "文章管理",
+              path: "/site/article",
+            },
+            {
+              name: "图标管理",
+              path: "/site/icon",
+            },
+            {
+              name: "数据管理",
+              path: "/site/data",
+            },
+            {
+              name: "职位管理",
+              path: "/site/position",
+            },
+          ],
+        },
+      ];
+
+      // 转换成这个样子
+      const Menus = {
+        merchant: {
+          title: "客户系统",
+          children: {
+            home: {
+              title: "首页",
+            },
+            baseConfigure: {
+              title: "基础配置",
+              children: {
+                // customerEntry: {
+                //   title: "客户入驻",
+                // },
+                level: {
+                  title: "客户等级",
+                },
+                customerManagement: {
+                  title: "客户管理",
+                },
+                organization: {
+                  title: "组织架构",
+                },
+              },
+            },
+            productConfigure: {
+              title: "产品配置",
+              children: {
+                attributeConfigure: {
+                  title: "属性配置",
+                },
+                faultManagement: {
+                  title: "故障管理",
+                },
+              },
+            },
+            financeConfigure: {
+              title: "账务配置",
+              children: {
+                servicePrice: {
+                  title: "服务价格",
+                },
+                rebateConfigure: {
+                  title: "返利配置",
+                },
+                applicationQuota: {
+                  title: "额度申请",
+                },
+                // priceAudit: {
+                //   title: "价格审核",
+                // },
+                rechargeConfiguration: {
+                  title: "充值配置",
+                },
+              },
+            },
+            b2b: {
+              title: "B2B管理",
+              children: {
+                shop: {
+                  title: "店铺管理",
+                },
+                serviceType: {
+                  title: "服务类型",
+                },
+                product: {
+                  title: "客户产品",
+                },
+                warrantyType: {
+                  title: "质保类型",
+                },
+              },
+            },
+          },
+        },
+        serviceStation: {
+          title: "网点系统",
+          children: {
+            home: {
+              title: "首页",
+            },
+            baseConfigure: {
+              title: "基础配置",
+              children: {
+                // stationEntry: { title: "网点入驻" },
+                stationManagement: {
+                  title: "网点管理",
+                },
+                // stationEngineers: { title: "网点师傅" },
+                warrantyDepositLevel: {
+                  title: "质保等级",
+                },
+                scoreRule: {
+                  title: "积分规则",
+                },
+                organization: {
+                  title: "组织架构",
+                },
+              },
+            },
+            financeConfigure: {
+              title: "财务配置",
+              children: {
+                servicePrice: {
+                  title: "服务价格",
+                },
+                // priceReview: {
+                //   title: "价格审核"
+                // },
+                timelinessReward: {
+                  title: "时效奖励",
+                },
+              },
+            },
+          },
+        },
+        // customerService: {
+        //   title: "客服系统",
+        //   children: {
+        //     home: {
+        //       title: '首页'
+        //     },
+        //     workOrderConfigure: {
+        //       title: "工单配置",
+        //       children: {
+        //         dispatchStaff: { title: "员工分单" },
+        //         dispatchDepartment: { title: "部门分单" },
+        //       },
+        //     },
+        // systemConfigure: {
+        //     title: "系统配置",
+        // },
+        //   },
+        // },
+        // finance: {
+        //     title: "财务系统",
+        //     children: {
+        //         financeConfigure: {
+        //             title: "账务配置",
+        //         },
+        //         systemConfigure: {
+        //             title: "系统配置",
+        //         },
+        //     },
+        // },
+        platform: {
+          title: "后台管理系统",
+          children: {
+            home: {
+              title: "首页",
+            },
+            baseConfigure: {
+              title: "基础配置",
+              children: {
+                ruleEngine: {
+                  title: "规则引擎",
+                },
+                warningConfigure: {
+                  title: "预警配置",
+                },
+                region: {
+                  title: "区域管理",
+                },
+                forbiddenWords: {
+                  title: "禁用词语",
+                },
+                protocolConfigure: {
+                  title: "协议配置",
+                },
+                protocolDocument: {
+                  title: "协议档案",
+                },
+                questionnaireTemplate: {
+                  title: "问卷模板",
+                },
+                organization: {
+                  title: "组织架构",
+                },
+                examination: {
+                  title: "题目管理",
+                },
+                examinationPaper: {
+                  title: "试卷管理",
+                },
+              },
+            },
+            serviceConfigure: {
+              title: "服务配置",
+              children: {
+                complainJudge: {
+                  title: "投诉判责",
+                },
+                orderNode: {
+                  title: "单据节点",
+                },
+                photoTemplate: {
+                  title: "照片模板",
+                },
+                serviceSystem: {
+                  title: "服务体系",
+                },
+                // serviceSpecification: {
+                //     title: "服务规范",
+                // },
+                serviceType: {
+                  title: "服务类型",
+                },
+                // completionInformation: {
+                //     title: "完工信息",
+                // },
+                // exceptionFeedback: {
+                //   title: "异常反馈",
+                // },
+                // causesStagnation: {
+                //   title: "停滞原因",
+                // },
+                trackProgress: {
+                  title: "跟踪进度",
+                },
+                // materialCategory: {
+                //   title: "辅材分类",
+                // },
+                material: {
+                  title: "辅材项目",
+                },
+              },
+            },
+            productConfigure: {
+              title: "产品配置",
+              children: {
+                productCategory: {
+                  title: "产品分类",
+                },
+                productManagement: {
+                  title: "产品管理",
+                },
+                attributeConfigure: {
+                  title: "属性配置",
+                },
+                // maintenanceFault: {
+                //     title: "维修管理",
+                // },
+                faultManagement: {
+                  title: "故障管理",
+                },
+                partsManagement: {
+                  title: "配件管理",
+                },
+              },
+            },
+            financeConfigure: {
+              title: "账务配置",
+              children: {
+                // timelinessReward: {
+                //     title: "时效奖励",
+                // },
+                // timelinessConfigure: {
+                //     title: "时效配置",
+                // },
+                referencePrice: {
+                  title: "参考价格",
+                },
+                // rechargeConfigure: {
+                //     title: "充值配置",
+                // },
+                publicFundRule: {
+                  title: "互助基金",
+                },
+              },
+            },
+            systemConfigure: {
+              title: "设置中心",
+              children: {
+                system: {
+                  title: "系统设置",
+                  children: {
+                    subSystem: {
+                      title: "系统管理",
+                    },
+                    auth: {
+                      title: "授权管理",
+                    },
+                    serialNumber: {
+                      title: "序号管理",
+                    },
+                    token: {
+                      title: "令牌管理",
+                    },
+                    task: {
+                      title: "任务管理",
+                    },
+                    message: {
+                      title: "消息处理",
+                    },
+                    queue: {
+                      title: "队列管理",
+                    },
+                    log: {
+                      title: "系统日志",
+                    },
+                    messageTemplate: {
+                      title: "消息模板",
+                    },
+                  },
+                },
+                applicationExceptionType: {
+                  title: "APP异常类型",
+                },
+                dictionary: {
+                  title: "字典管理",
+                },
+                menu: {
+                  title: "菜单管理",
+                },
+                department: {
+                  title: "部门管理",
+                },
+                role: {
+                  title: "角色权限",
+                },
+              },
+            },
+            systemMonitoring: {
+              title: "系统监控",
+              children: {
+                systemLog: {
+                  title: "系统日志",
+                },
+                onlineUser: {
+                  title: "在线用户",
+                },
+                interfaceDocument: {
+                  title: "接口文档",
+                },
+              },
+            },
+          },
+        },
+        site: {
+          title: "公司官网",
+          children: {
+            home: {
+              title: "首页",
+            },
+            picture: {
+              title: "图片管理",
+            },
+            article: {
+              title: "文章管理",
+            },
+            icon: {
+              title: "图标管理",
+            },
+            data: {
+              title: "数据管理",
+            },
+            position: {
+              title: "职位管理",
+            },
+          },
+        },
+      };
+    </script>
+
+    <script>
+      /**
+       *
+       * arr -> {name routes } | {name path}
+       *
+       *
+       * */
+      function reverseRoutesPath(arr,currentLevel=0){
+        let obj = {}
+        let upperPath
+        arr.forEach(item=>{
+          // 1.  有path/routes 去区分是否到底部了
+          if(item.routes){
+            // 递归
+            const { children ,upperPath:thisPath}= reverseRoutesPath(item.routes,currentLevel + 1)
+            if(thisPath){
+              if(obj[thisPath]){
+                obj[thisPath].children = {...obj[thisPath].children,...children}
+                obj[thisPath].title = item.name
+              }else{
+                obj[thisPath] = {
+                  title:item.name,
+                  children
+                }
+              }
+            }
+          }else if(item.path){
+            const pathArr = item.path.substring(1).split('/')
+            const key = pathArr[currentLevel]
+            if(!upperPath && (currentLevel-1) >=0){
+              upperPath = pathArr[currentLevel-1]
+            }
+            obj = Object.assign(obj, {
+                [key]: {
+                  title: item.name,
+                  // 添加上原有的属性，不需要可以删掉
+                  ...item
+                }
+              }
+            )
+          }
+        })
+        return {children:obj,upperPath}
+      }
+      function transformRoutesPath (arr){
+        const res = reverseRoutesPath(arr,0)
+        return {
+          ...res.children
+        }
+      }
+      
+      console.log(transformRoutesPath (arr));
+    </script>
+  </body>
+</html>
