@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      const obj = {
+        a: {
+          b: {
+            c: {
+              f: "我是abcf呀呀呀",
+            },
+            d: undefined,
+            e: "我是abe呀",
+          },
+        },
+      };
+      //
+      function dlv(targetObj, path) {
+        const queue = path.slice();
+        // 如果仍然有路径就继续往下找，直到没有就返回
+        const reverseFind = (thisObj) => {
+          // 边界情况：如果没有了，则直接返回
+          if (queue.length <= 0) return thisObj;
+          // 取出当前的路径，用shift
+          const thisPath = queue.shift();
+          if (thisObj[thisPath]) {
+            return reverseFind(thisObj[thisPath]);
+          } else {
+            return undefined;
+          }
+          return undefined;
+        };
+        const ret = reverseFind(targetObj);
+        console.log(ret);
+        return ret;
+      }
+      dlv(obj, ["a", "b", "c", "f"]); // "我是abcf呀呀呀"
+      dlv(obj, ["a", "b", "e"]); // "我是abe呀"
+      dlv(obj, ["a", "b", "d"]); // undefined
+      dlv(obj, ["a", "b", "g"]); // undefined
+      export const d = dlv;
+    </script>
+  </body>
+</html>
