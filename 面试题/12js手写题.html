@@ -236,6 +236,33 @@
             }
         }
 
+        // 12 判断版本号,只有v1 > v2才返回true
+        function judgeVersion(v1,v2){
+            // 相同的才往下判断
+            const v1Arr = v1.split('.')
+            const v2Arr = v2.split('.')
+            const max = Math.max(v1Arr.length,v2Arr.length)
+            let ret = false
+            let i = 0 
+            while(i<max){
+                let a = Number(v1Arr[i]),b=Number(v2Arr[i])
+                console.log(a,b)
+                if(a>b){
+                    return ret = true
+                    
+                }else if(a===b){
+                    i++
+                }else{
+                    // 小于，则直接退出
+                    return false
+                }
+            }
+            console.log('zhixingwanbi');
+            return ret
+        }
+        judgeVersion('1.1.1','1.1.2') // false
+        judgeVersion('1.1.1','1.0.2') // true
+        judgeVersion('1.1.1','1.1.1') // true
     </script>
 </body>
 </html>
