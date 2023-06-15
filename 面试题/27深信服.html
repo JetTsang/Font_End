@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 深信服面试题
+      // 1. 求出id
+      const arr = [
+        { id: 1, v: false },
+        { id: 2, v: true },
+        { id: 3, v: true },
+        undefined,
+      ];
+      // 预期结果：[ 2,3 ]
+
+      // 2. 说出下面的执行顺序
+      async function fn1() {
+        console.log("fn1 start");
+        await fn2();
+        console.log("fn1 end");
+      }
+      async function fn2() {
+        console.log("fn2");
+      }
+      setTimeout(() => {
+        console.log("setTimeOut");
+      }, 0);
+      console.log("start");
+      fn1();
+      new Promise((resolve) => {
+        console.log("promise");
+        resolve();
+      }).then(() => {
+        console.log("promise2");
+      });
+      console.log("end");
+
+      // 3. 将数据转换
+      // 注意：children 可能有很多级
+      const list = [
+        {
+          id: 1,
+          name: "hola",
+          children: [
+            { id: 11, name: "hair" },
+            { id: 12, name: "arm" },
+          ],
+        },
+        {
+          id: 2,
+          name: "holy",
+          children: [
+            { id: 21, name: "hand" },
+            { id: 22, name: "eye" },
+          ],
+        },
+        { id: 3, name: "white" },
+      ];
+      // 转换成
+      const res = {
+        1: { name: "hola", children: ["11", "12"] },
+        2: { name: "holy", children: ["21", "22"] },
+        3: { name: "white" },
+        11: { name: "hair", parentId: 1 },
+        12: { name: "arm", parentId: 1 },
+        21: { name: "hand", parentId: 2 },
+        22: { name: "eye", parentId: 2 },
+      };
+      function transform2Obj(list) {
+        const ret = {};
+        function reverse(thisList, parentId = null) {
+          thisList.forEach((item) => {
+            const temp = {
+              name: item.name,
+            };
+            if (parentId) {
+              temp["parentId"] = parentId;
+            }
+            ret[item.id] = temp;
+            if (item.children && item.children.length > 0) {
+              reverse(item.children, item.id);
+            }
+          });
+        }
+        reverse(list);
+        console.log(ret);
+        for (let i in ret) {
+          if (ret[i].parentId) {
+            if (ret[ret[i].parentId].children) {
+              ret[ret[i].parentId].children.push(i);
+            } else {
+              ret[ret[i].parentId].children = [i];
+            }
+          }
+        }
+        console.log(ret);
+        return ret;
+      }
+      transform2Obj(list);
+    </script>
+  </body>
+</html>
