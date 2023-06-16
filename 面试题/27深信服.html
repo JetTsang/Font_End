@@ -19,26 +19,26 @@
       // 预期结果：[ 2,3 ]
 
       // 2. 说出下面的执行顺序
-      async function fn1() {
-        console.log("fn1 start");
-        await fn2();
-        console.log("fn1 end");
-      }
-      async function fn2() {
-        console.log("fn2");
-      }
-      setTimeout(() => {
-        console.log("setTimeOut");
-      }, 0);
-      console.log("start");
-      fn1();
-      new Promise((resolve) => {
-        console.log("promise");
-        resolve();
-      }).then(() => {
-        console.log("promise2");
-      });
-      console.log("end");
+    //   async function fn1() {
+    //     console.log("fn1 start");
+    //     await fn2();
+    //     console.log("fn1 end");
+    //   }
+    //   async function fn2() {
+    //     console.log("fn2");
+    //   }
+    //   setTimeout(() => {
+    //     console.log("setTimeOut");
+    //   }, 0);
+    //   console.log("start");
+    //   fn1();
+    //   new Promise((resolve) => {
+    //     console.log("promise");
+    //     resolve();
+    //   }).then(() => {
+    //     console.log("promise2");
+    //   });
+    //   console.log("end");
 
       // 3. 将数据转换
       // 注意：children 可能有很多级
@@ -102,6 +102,80 @@
         return ret;
       }
       transform2Obj(list);
+
+      // 题目：实现一个对树型结构进行过滤的函数，其中树形结构的格式如下：
+
+      // tree = [
+      //     {name: 'A'},
+      //     {name: 'B', children: [
+      //         {name: 'A'},
+      //         {name: 'D', children: []},
+      //     ]},
+      //     {name: 'C'}
+      // ]
+
+      // 1. 假设我输入的 filterName 为 A 则过滤后返回的结果为
+      // [
+      //     {name: 'A'},
+      //     {name: 'B', children: [
+      //         {name: 'A'}
+      //     ]}
+      // ]
+
+      // 2. 假设我输入的 filterName 为 B 则过滤后返回的结果为
+      // [
+      //     {name: 'B', children: [
+      //         {name: 'A'},
+      //         {name: 'D', children: []},
+      //     ]}
+      // ]
+
+      // 3. 假设我输入的 filterName 为 D 则过滤后返回的结果为
+      // [
+      //     {name: 'B', children: [
+      //         {name: 'D', children: []},
+      //     ]}
+      // ]
+
+      // 实现该函数，要求不允许对原有的tree做任何修改，最终返回结果是一棵新结构出来的树
+      function filter(tree, filterName) {
+        const ret = [];
+        function reverseTree(tree) {
+          const temList = [];
+          tree.forEach((item) => {
+            let hasNameItem;
+            if (item.name === filterName) {
+              hasNameItem = item;
+            }
+
+            if (!hasNameItem && item.children && item.children.length > 0) {
+              const tempChildren = reverseTree(item.children);
+              if (tempChildren && tempChildren.length>0) {
+                hasNameItem = {
+                  ...item,
+                  children: tempChildren,
+                };
+              }
+            }
+
+            hasNameItem && temList.push(hasNameItem);
+          });
+          return temList;
+        }
+        ret.push(...reverseTree(tree));
+
+        return ret;
+      }
+
+      const tree = [
+        { name: "A" },
+        { name: "B", children: [{ name: "A" }, { name: "D", children: [] }] },
+        { name: "C" },
+      ];
+
+      console.log(filter(tree, "A"));
+      console.log(filter(tree, "B"));
+      console.log(filter(tree, "D"));
     </script>
   </body>
 </html>
