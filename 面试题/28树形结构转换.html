@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      //列表转成树形结构
+      let arr = [
+        { id: 1, name: "部门1", pid: 0 },
+        { id: 2, name: "部门2", pid: 1 },
+        { id: 3, name: "部门3", pid: 1 },
+        { id: 4, name: "部门4", pid: 3 },
+        { id: 5, name: "部门5", pid: 4 },
+        { id: 6, name: "部门6", pid: 0 },
+      ];
+      const listToTree = (list) => {
+        const ret = [];
+        // 利用map数据结构
+        const map = new Map();
+        for (let i of list) {
+          map.set(i.id, i);
+        }
+        for (let [k, v] of map) {
+          if (v.pid && map.get(v.pid)) {
+            if (Array.isArray(map.get(v.pid).children)) {
+              map.get(v.pid).children.push(v);
+            } else {
+              map.get(v.pid).children = [v];
+            }
+          }
+        }
+        for (let [k, v] of map) {
+          ret.push(v);
+        }
+        return ret.filter((i) => i.pid === 0);
+      };
+
+      const res = listToTree(arr);
+      console.log(res);
+    //   [
+    //     {
+    //       id: 1,
+    //       name: "部门1",
+    //       pid: 0,
+    //       children: [
+    //         {
+    //           id: 2,
+    //           name: "部门2",
+    //           pid: 1,
+    //         },
+    //         {
+    //           id: 3,
+    //           name: "部门3",
+    //           pid: 1,
+    //           children: [
+    //             {
+    //               id: 4,
+    //               name: "部门4",
+    //               pid: 3,
+    //               children: [
+    //                 {
+    //                   id: 5,
+    //                   name: "部门5",
+    //                   pid: 4,
+    //                 },
+    //               ],
+    //             },
+    //           ],
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       id: 6,
+    //       name: "部门6",
+    //       pid: 0,
+    //     },
+    //   ];
+    </script>
+  </body>
+</html>
