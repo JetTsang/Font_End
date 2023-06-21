@@ -104,35 +104,34 @@
               id: 4,
               text: "节点1_2",
               parentId: 1,
-            }
+            },
           ],
         },
         {
           id: 5,
           text: "节点2",
           parentId: 0,
-        }
+        },
       ];
 
       const flattenTree = (data) => {
-        const ret = []
-        if(data.length == 0 ){
-          return ret
+        const ret = [];
+        if (data.length == 0) {
+          return ret;
         }
-        function traverse(item){
+        function traverse(item) {
           // 判断是否有children
-          if(item.children && item.children.length > 0){
-
-            for (let i of item.children){
-              traverse(i)
+          if (item.children && item.children.length > 0) {
+            for (let i of item.children) {
+              traverse(i);
             }
           }
-          ret.push(item)
+          ret.push(item);
         }
-        for(let i of data){
-          traverse(i)
+        for (let i of data) {
+          traverse(i);
         }
-        return ret
+        return ret;
       };
       const flattenedData = flattenTree(data);
       console.log(flattenedData);
@@ -140,6 +139,46 @@
       //     { id: 1, text: '节点1', parentId: 0 },
       //     { id: 2, text: '节点1_1', parentId: 1 }
       //  ]
+    </script>
+    <script type="module">
+      // 计算目录树的深度
+      const tree = {
+        name: "root",
+        children: [
+          { name: "叶子1-1" },
+          { name: "叶子1-2" },
+          {
+            name: "叶子2-1",
+            children: [
+              {
+                name: "叶子3-1",
+                children: [
+                  {
+                    name: "叶子4-1",
+                    children: [{}],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const depth = getTreeDepth(tree);
+      console.log(depth); // 输出: 5
+      function getTreeDepth(tree) {
+        let maxDeepth = 0;
+        const DFS = (treeItem, currentDeepth) => {
+          maxDeepth = Math.max(maxDeepth, currentDeepth);
+          if (treeItem.children && treeItem.children.length > 0) {
+            for (let i of treeItem.children) {
+              DFS(i, currentDeepth + 1);
+            }
+          }
+        };
+        DFS(tree, 1);
+        return maxDeepth;
+      }
     </script>
   </body>
 </html>
