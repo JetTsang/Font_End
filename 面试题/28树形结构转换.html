@@ -221,26 +221,74 @@
           },
         ],
       };
-      
+
       const nodeName = findNodeNameById(tree, 3);
       console.log(nodeName); // 'c11'
-      function findNodeNameById(tree,id){
-        let name = null
+      function findNodeNameById(tree, id) {
+        let name = null;
         // 整理一个哈希表出来，最后通过hash表找到内容
-        const DFS = (node)=>{
-          if(node.id == id){
-            name = node.name
-            return 
+        const DFS = (node) => {
+          if (node.id == id) {
+            name = node.name;
+            return;
           }
 
-          if(node.children && node.children.length > 0){
-            for(let i of node.children){
-              DFS(i)
+          if (node.children && node.children.length > 0) {
+            for (let i of node.children) {
+              DFS(i);
             }
           }
+        };
+        DFS(tree);
+        return name;
+      }
+    </script>
+    <script type="module">
+      // 查找 树形结构 中的 目标id 路径
+      const json = {
+        id: 1,
+        children: [
+          { id: 2, children: [{ id: 3, children: [] }] },
+          {
+            id: 4,
+            children: [
+              { id: 5, children: [] },
+              { id: 6, children: [] },
+            ],
+          },
+          { id: 7, children: [] },
+        ],
+      };
+      const nodePath = findNode(5);
+      console.log(nodePath); // '1->4->5'
+      function findNode(id){
+        const path = []
+        // 深度递归的时候，放入，符合要求就弹出
+        const DFS = (node)=>{
+          path.push(node.id)
+          // 如果找到了，就退出
+          if(node.id == id){
+            return 
+          }
+          // 如果有children ，就进去找
+          if( node.children && node.children.length > 0 ){
+            for(const i of node.children){
+              DFS(i)
+              // 如果path收集完毕, 退出此函数
+              if(path.slice(-1)[0]===id){
+                // 这里的break只是退出for循环
+                // break
+                // 这里需要return 来结束当前函数
+                return 
+              }
+            }
+          }
+
+          // 不符合条件，则删除此条路径
+          path.pop()
         }
-        DFS(tree)
-        return name 
+        DFS(json)
+        return path.join('->')
       }
     </script>
   </body>
