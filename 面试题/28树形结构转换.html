@@ -180,5 +180,68 @@
         return maxDeepth;
       }
     </script>
+    <script type="module">
+      // 根据 id 从多叉树里面查找出对应的节点的 name
+
+      const tree = {
+        name: "root",
+        id: 1,
+        children: [
+          {
+            name: "c1",
+            id: 2,
+            children: [
+              {
+                name: "c11",
+                id: 3,
+                children: [],
+              },
+              {
+                name: "c12",
+                id: 4,
+                children: [],
+              },
+            ],
+          },
+          {
+            name: "c2",
+            id: 5,
+            children: [
+              {
+                name: "c21",
+                id: 6,
+                children: [],
+              },
+              {
+                name: "c22",
+                id: 7,
+                children: [],
+              },
+            ],
+          },
+        ],
+      };
+      
+      const nodeName = findNodeNameById(tree, 3);
+      console.log(nodeName); // 'c11'
+      function findNodeNameById(tree,id){
+        let name = null
+        // 整理一个哈希表出来，最后通过hash表找到内容
+        const DFS = (node)=>{
+          if(node.id == id){
+            name = node.name
+            return 
+          }
+
+          if(node.children && node.children.length > 0){
+            for(let i of node.children){
+              DFS(i)
+            }
+          }
+        }
+        DFS(tree)
+        return name 
+      }
+    </script>
   </body>
 </html>
