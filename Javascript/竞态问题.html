@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const fn = (duration) =>
+        new Promise((r) => {
+          setTimeout(r, duration);
+        });
+      //   方法1
+      //   function resolveLast() {
+      //     const current = {
+      //       currentID: 0,
+      //     };
+      //     const wrappedFn = (fn) => {
+      //       current.currentID += 1;
+      //       const thisFetchId = current.currentID;
+      //       fn.call(this, current, thisFetchId);
+      //     };
+      //     return wrappedFn;
+      //   }
+
+      // const wrapper = resolveLast();
+      // wrapper(async (current, thisFetchId) => {
+      //   console.log(current.currentID, thisFetchId);
+      //   // 等待请求
+      //   await fn(1000);
+      //   // 处理逻辑
+      //   if (current.currentID !== thisFetchId) return;
+      //   console.log("100请求完毕");
+      // });
+      // wrapper(async (current, thisFetchId) => {
+      //   console.log(current.currentID, thisFetchId);
+      //   // 等待请求
+      //   await fn(3000);
+      //   // 处理逻辑
+      //   if (current.currentID !== thisFetchId) return;
+      //   console.log("300请求完毕");
+      // });
+      // 方法2
+      function resolveLast() {
+        let currentID = 0;
+        const getCurrentId = () => currentID;
+        const wrappedFn = (fn) => {
+          currentID += 1;
+          const thisFetchId = currentID;
+          fn.call(this, getCurrentId, thisFetchId);
+        };
+        return wrappedFn;
+      }
+
+      const wrapper = resolveLast();
+      wrapper(async (getCurrentId, thisFetchId) => {
+        console.log(getCurrentId(), thisFetchId);
+        // 等待请求
+        await fn(1000);
+        // 处理逻辑
+        if (getCurrentId() !== thisFetchId) return;
+        console.log("100请求完毕");
+      });
+      wrapper(async (getCurrentId, thisFetchId) => {
+        console.log(getCurrentId(), thisFetchId);
+        // 等待请求
+        await fn(3000);
+        // 处理逻辑
+        if (getCurrentId() !== thisFetchId) return;
+        console.log("300请求完毕");
+      });
+    </script>
+  </body>
+</html>
