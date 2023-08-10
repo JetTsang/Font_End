@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>如何渲染一个思维导图</title>
+    <script src="./g6.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <div id="mindmap" style="height: 100vh"></div>
+    <!-- <script type="module">
+      const mindmapData = {
+        nodes: [
+          { id: "node1", label: "Node 1" },
+          { id: "node2", label: "Node 2" },
+          { id: "node3", label: "Node 3" },
+        ],
+        edges: [
+          { source: "node1", target: "node2" },
+          { source: "node1", target: "node3" },
+        ],
+      };
+      const container = document.getElementById("mindmap");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      
+      const graph = new G6.Graph({
+        container: container,
+        width: width,
+        height: height,
+        modes: {
+          default: ["drag-canvas", "drag-node"], // 可以拖拽画布和节点
+        },
+        defaultNode: {
+          shape: "circle",
+          size: 40,
+          style: {
+            fill: "steelblue",
+            stroke: "#000",
+          },
+        },
+        defaultEdge: {
+          style: {
+            stroke: "gray",
+          },
+        },
+      });
+      graph.data(mindmapData);
+      graph.render();
+    </script> -->
+    <script type="module">
+      const mindmapData = {
+        nodes: [
+          { id: "node1", label: "Node 1" },
+          { id: "node2", label: "Node 2" },
+          { id: "node3", label: "Node 3" },
+        ],
+        links: [
+          { source: "node1", target: "node2" },
+          { source: "node1", target: "node3" },
+        ],
+      };
+
+      const container = document.getElementById("mindmap");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      const svg = d3
+        .select("#mindmap")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+      const nodes = svg
+        .selectAll(".node")
+        .data(mindmapData.nodes)
+        .enter()
+        .append("circle")
+        .attr("class", "node")
+        .attr("cx", function (d, i) {
+          return 50 + i * 100;
+        })
+        .attr("cy", 50)
+        .attr("r", 20)
+        .style("fill", "steelblue");
+
+      const links = svg
+        .selectAll(".link")
+        .data(mindmapData.links)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("x1", function (d) {
+          return d.source.x;
+        })
+        .attr("y1", function (d) {
+          return d.source.y;
+        })
+        .attr("x2", function (d) {
+          return d.target.x;
+        })
+        .attr("y2", function (d) {
+          return d.target.y;
+        })
+        .style("stroke", "gray")
+        .style("stroke-width", 2);
+
+      const labels = svg
+        .selectAll(".label")
+        .data(mindmapData.nodes)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .attr("x", function (d, i) {
+          return 50 + i * 100;
+        })
+        .attr("y", 50)
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .text(function (d) {
+          return d.label;
+        })
+        .style("fill", "white");
+
+      nodes.call(d3.drag().on("drag", drag));
+
+      function drag(event, d) {
+        d3.select(this)
+          .attr("cx", (d.x = event.x))
+          .attr("cy", (d.y = event.y));
+
+        links
+          .attr("x1", function (link) {
+            return link.source.x;
+          })
+          .attr("y1", function (link) {
+            return link.source.y;
+          })
+          .attr("x2", function (link) {
+            return link.target.x;
+          })
+          .attr("y2", function (link) {
+            return link.target.y;
+          });
+      }
+    </script>
+  </body>
+</html>
