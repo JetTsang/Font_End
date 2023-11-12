@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红绿灯</title>
+</head>
+<body>
+    <script>
+        // 请设计1个红绿灯模拟程序 
+        // Green / Yellow / Red
+        const signal = new Signal({
+            init:'Green',
+            // 红黄绿
+            interval:[10,1,5]
+        })
+        // change事件，e --> e 里面可以知道当前的信号灯，下一个信号灯，以及此刻剩余的切换时间
+        // sinnal.on('change',(e)=>{ e.remain, e.next,e.sig })
+        // tick 每隔1s，调用次事件
+        // sinnal.on('change',(e)=>{ e.remain, e.next,e.sig })
+        // 取消监听事件
+        // signal.off
+
+        const SIGNAL_LIST = ['Red','Yellow','Green']
+        class Signal {
+            // 当前的信号灯
+            currentSig = ''
+            // 信号灯切换间隔
+            interval=[]
+            // 事件的map
+            // change: new Set()
+            eventMap = new Map()
+
+            // 
+            get next(){
+                const thisIndex = SIGNAL_LIST.indexOf(this.currentSig)
+                return 
+            }
+
+            constructor(options){
+                const {init,interval}  = options
+                this.currentSig = init
+                this.interval = interval
+                this.changeSig()
+
+            }
+
+            // 信号灯开始变化
+            changeSig(){
+
+            }
+
+            on(eventName,handler){
+                
+            }
+
+            // 从队列里面去找到对应的事件去触发
+            emit(eventName){
+                this.eventMap.get(eventName).forEach(method=>{
+                    method.call(this,this)
+                })
+            }
+
+            off(eventName,handler){
+                
+            }
+        }
+    </script>
+</body>
+</html>
