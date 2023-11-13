@@ -8,64 +8,119 @@
 </head>
 <body>
     <script>
+        const delay = (duration)=>{
+            return new Promise((resolve,reject)=>{
+                setTimeout(resolve,duration)
+            })
+        }
         // 请设计1个红绿灯模拟程序 
         // Green / Yellow / Red
-        const signal = new Signal({
-            init:'Green',
-            // 红黄绿
-            interval:[10,1,5]
-        })
+        // const signal = new Signal({
+        //     init:'Green',
+        //     // 绿黄红
+        //     intervalList:[10,1,5],
+        //     duration: 300
+        // })
         // change事件，e --> e 里面可以知道当前的信号灯，下一个信号灯，以及此刻剩余的切换时间
         // sinnal.on('change',(e)=>{ e.remain, e.next,e.sig })
         // tick 每隔1s，调用次事件
-        // sinnal.on('change',(e)=>{ e.remain, e.next,e.sig })
+        // sinnal.on('tick',(e)=>{ e.remain, e.next,e.sig })
         // 取消监听事件
         // signal.off
 
-        const SIGNAL_LIST = ['Red','Yellow','Green']
+        const SIGNAL_LIST = ['Green','Yellow','Red']
         class Signal {
             // 当前的信号灯
             currentSig = ''
             // 信号灯切换间隔
-            interval=[]
+            intervalList=[]
+
+            // 轮训是否开始切换
+            duration = 1000
             // 事件的map
             // change: new Set()
-            eventMap = new Map()
+            eventMap = new Map([['change',new Set()],['tick',new Set()]])
 
-            // 
-            get next(){
-                const thisIndex = SIGNAL_LIST.indexOf(this.currentSig)
-                return 
+            startTimeStamp = 0
+
+            // 当前信号灯对应的索引，用来获取下一个信号灯，和当前信号灯的持续时间
+            get currentSigIndex(){
+                return SIGNAL_LIST.indexOf(this.currentSig)
+            }
+            
+            // 下一个信号灯
+            get nextSig(){
+                if(this.currentSigIndex == (SIGNAL_LIST.length - 1)){
+                    return SIGNAL_LIST[0]
+                }else {
+                    return SIGNAL_LIST[this.currentSigIndex + 1]
+                }
             }
 
-            constructor(options){
-                const {init,interval}  = options
-                this.currentSig = init
-                this.interval = interval
-                this.changeSig()
+            // 当前这个信号灯的时间 单位 Second
+            get currentInterval(){
+                return this.intervalList[this.currentSigIndex]
+            }
 
+            // 这个信号灯结束的时间戳
+            get currentSigEndTimeStamp(){
+                return this.currentInterval * 1000 + this.startTimeStamp
+            }
+
+            get remainTime(){
+                return (this.currentSigEndTimeStamp - Date.now())
+            }
+            
+
+            constructor(options){
+                const {init,intervalList,duration}  = options
+                this.currentSig = init
+                this.intervalList = intervalList
+                this.duration = duration
+                this.changeSig()
+                this.startTimeStamp = Date.now()
             }
 
             // 信号灯开始变化
-            changeSig(){
-
+            async changeSig(){
+                // 定时去更新红绿灯
+                await delay(this.duration)
+                this.call('tick')
+                if(this.remainTime<=0){
+                    this.startTimeStamp = Date.now()
+                    this.currentSig = this.nextSig
+                    this.call('change')
+                }
+                this.changeSig()
             }
 
             on(eventName,handler){
-                
+                this.eventMap.get(eventName).add(handler)
             }
 
             // 从队列里面去找到对应的事件去触发
-            emit(eventName){
+            call(eventName){
                 this.eventMap.get(eventName).forEach(method=>{
                     method.call(this,this)
                 })
             }
 
             off(eventName,handler){
-                
+                this.eventMap.get(eventName).delete(handler)
             }
         }
+        const signal = new Signal({
+            init:'Green',
+            // 红黄绿
+            intervalList:[10,1,5],
+            duration: 1000
+        })
+        signal.on('tick',(e)=>{
+            console.log(e.currentSig)
+        })
+        signal.on('change',(e)=>{
+            // console.log(e)
+        })
     </script>
 </body>
 </html>
