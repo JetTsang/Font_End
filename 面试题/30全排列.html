@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 题目： 判断全组合
+        // 比方说下面这个函数生成的就是全排列
+        function getCombinationList(){
+            var key1Options = ['甲', '乙'];
+            var key2Options = ['a', 'b'];
+            var key3Options = ['1', '2', '3'];
+    
+            var combinations = [];
+    
+            for (var i = 0; i < key1Options.length; i++) {
+                for (var j = 0; j < key2Options.length; j++) {
+                    for (var k = 0; k < key3Options.length; k++) {
+                        var combination = {
+                            key1: key1Options[i],
+                            key2: key2Options[j],
+                            key3: key3Options[k]
+                        };
+                        combinations.push(combination);
+                    }
+                }
+            }
+            return combinations
+        }
+        console.log(getCombinationList());
+
+        // 完成这个函数 ，判断是否是全排列 
+        function isCombination (dataList){
+            // 思路：首先对数组进行去重，
+            // 然后判断每个字段对应的可能，并且相✖️得到总和，等于去重后的数组长度 
+
+            const keys  = Object.keys(dataList[0])
+            const keyMap = new Map()
+            keys.forEach(key=>{
+                dataList.forEach(data=>{
+                    let valueSet = keyMap.get(key)
+                    if(!valueSet){
+                        valueSet = new Set()
+                        keyMap.set(key,valueSet)
+                    }
+                    valueSet.add(data[key])
+                })
+            })
+            console.log(keyMap)
+            // key1 --> 甲乙
+            // key2 -->
+            // 可能的组合个数
+            const  possiableCombinationSum = [...keyMap.values()].reduce((pre,set)=>pre*set.size,1)
+            // 去重后的数组的长度
+            
+            return false 
+        }
+        isCombination(getCombinationList())
+    </script>
+</body>
+</html>
