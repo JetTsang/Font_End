@@ -1,65 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <script>
-        // 题目： 判断全组合
-        // 比方说下面这个函数生成的就是全排列
-        function getCombinationList(){
-            var key1Options = ['甲', '乙'];
-            var key2Options = ['a', 'b'];
-            var key3Options = ['1', '2', '3'];
-    
-            var combinations = [];
-    
-            for (var i = 0; i < key1Options.length; i++) {
-                for (var j = 0; j < key2Options.length; j++) {
-                    for (var k = 0; k < key3Options.length; k++) {
-                        var combination = {
-                            key1: key1Options[i],
-                            key2: key2Options[j],
-                            key3: key3Options[k]
-                        };
-                        combinations.push(combination);
-                    }
-                }
+      // 题目： 判断全组合
+      // 比方说下面这个函数生成的就是全排列
+      function getCombinationList() {
+        var key1Options = ["甲", "乙"];
+        var key2Options = ["a", "b"];
+        var key3Options = ["1", "2", "3"];
+
+        var combinations = [];
+
+        for (var i = 0; i < key1Options.length; i++) {
+          for (var j = 0; j < key2Options.length; j++) {
+            for (var k = 0; k < key3Options.length; k++) {
+              var combination = {
+                key1: key1Options[i],
+                key2: key2Options[j],
+                key3: key3Options[k],
+              };
+              combinations.push(combination);
             }
-            return combinations
+          }
         }
-        console.log(getCombinationList());
+        return combinations;
+      }
+      console.log(getCombinationList());
 
-        // 完成这个函数 ，判断是否是全排列 
-        function isCombination (dataList){
-            // 思路：首先对数组进行去重，
-            // 然后判断每个字段对应的可能，并且相✖️得到总和，等于去重后的数组长度 
+      // 完成这个函数 ，判断是否是全排列
+      function isCombination(dataList) {
+        // 思路：首先对数组进行去重，
+        // 然后判断每个字段对应的可能，并且相✖️得到总和，等于去重后的数组长度
 
-            const keys  = Object.keys(dataList[0])
-            const keyMap = new Map()
-            keys.forEach(key=>{
-                dataList.forEach(data=>{
-                    let valueSet = keyMap.get(key)
-                    if(!valueSet){
-                        valueSet = new Set()
-                        keyMap.set(key,valueSet)
-                    }
-                    valueSet.add(data[key])
-                })
-            })
-            console.log(keyMap)
-            // key1 --> 甲乙
-            // key2 -->
-            // 可能的组合个数
-            const  possiableCombinationSum = [...keyMap.values()].reduce((pre,set)=>pre*set.size,1)
-            // 去重后的数组的长度
-            
-            return false 
-        }
-        isCombination(getCombinationList())
+        const keys = Object.keys(dataList[0]);
+        // 构建一个映射，将data[key] --> 1
+        const keyMap = new Map();
+        // 甲-a-1，甲-a-3 等等，将每个key1-key2-key3组合成唯一的值
+        const filterSet = new Set();
+        // 优化，构建一个映射 甲 --> 随机数/数字
+        const valueMap = new Map()
+        let temp = 0 
+        dataList.forEach((data) => {
+          const valueArr = [];
+          keys.forEach((key) => {
+            let valueSet = keyMap.get(key);
+            if (!valueSet) {
+              valueSet = new Set();
+              keyMap.set(key, valueSet);
+            }
+            valueSet.add(data[key]);
+            // 原本的做法，直接甲-a-1
+            // valueArr.push(data[key]);
+            // 对每一种组合做一个映射，确保利用Set结构去重
+            if( !valueMap.get( data[key])){
+                // 注意这里，不要用Date.now()这种，因为运算太快了，now可能是一样的
+                valueMap.set( data[key],++temp)
+            }
+            valueArr.push(valueMap.get( data[key]));
+          });
+          filterSet.add(valueArr.join("-"));
+        });
+        console.log(valueMap);
+        console.log(keyMap);
+        // key1 --> 甲乙
+        // key2 -->
+        // 可能的组合个数
+        const possiableCombinationSum = [...keyMap.values()].reduce(
+          (pre, set) => pre * set.size,
+          1
+        );
+        // 去重后的数组的长度
+        const size = filterSet.size;
+        console.log(filterSet);
+        return possiableCombinationSum === size;
+      }
+      console.log(isCombination(getCombinationList()));
+      const inputData = [
+        // 可以注释掉一个判断是否全组合
+        // {
+        //   key1: "甲",
+        //   key2: "a",
+        //   key3: "1",
+        // },
+        {
+          key1: "甲",
+          key2: "a",
+          key3: "2",
+        },
+        {
+          key1: "甲",
+          key2: "a",
+          key3: "3",
+        },
+        {
+          key1: "甲",
+          key2: "b",
+          key3: "1",
+        },
+        {
+          key1: "甲",
+          key2: "b",
+          key3: "2",
+        },
+        {
+          key1: "甲",
+          key2: "b",
+          key3: "3",
+        },
+        {
+          key1: "乙",
+          key2: "a",
+          key3: "1",
+        },
+        {
+          key1: "乙",
+          key2: "a",
+          key3: "2",
+        },
+        {
+          key1: "乙",
+          key2: "a",
+          key3: "3",
+        },
+        {
+          key1: "乙",
+          key2: "b",
+          key3: "1",
+        },
+        {
+          key1: "乙",
+          key2: "b",
+          key3: "2",
+        },
+        {
+          key1: "乙",
+          key2: "b",
+          key3: "3",
+        },
+      ];
+      console.log(isCombination(inputData));
     </script>
-</body>
+  </body>
 </html>
