@@ -23,6 +23,18 @@
         return current
       })
 
+      requestList.reduce(async (pre,current,currentIndex,array)=>{
+        if(currentIndex == 1){
+          requestList.push(99)
+        }
+        // 等待上一个promise返回
+        await pre
+        console.log(current)
+        return request()
+      },0)
+
+
+
 
 
     </script>
