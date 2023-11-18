@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const request = ()=>{
+        return new Promise((resolve,reject)=>{
+          setTimeout(resolve,1000)
+        })
+      }
+      // 利用reduce实现串行控制 
+
+      // 有一个接口，需要不断的调用，或者前一个接口需要利用到后一个接口的数据，因此需要不断调用
+      const requestList = [1,2,3]
+      // 如果不输入第三个参数，则从index = 1开始
+      requestList.reduce((pre,current,currentIndex,array)=>{
+        console.log(pre)
+        return current
+      })
+
+
+
+    </script>
+  </body>
+</html>
