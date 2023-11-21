@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="
+https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js
+"></script>
+    <title>what is Promise like ? </title>
+</head>
+<body>
+    <script>
+        // 题目： 怎么辨别是一个promise like ?
+        // 比如 jquery 里面的 $.ajax()
+        // await $.ajax() 它不是一个promise ，但可以像promise一样使用
+        // (async ()=>{
+        //     await $.ajax({url:'https://zhuanlan.zhihu.com/p/256912654'})
+        // })()
+        console.log($.ajax());
+        // {then(){}}
+        // 根据promise A+ 规范,
+        // 是一个对象或者函数
+        // 并且有then方法
+        function isPromiseLike(what){
+
+            return (typeof what == 'function' || typeof what == 'object')
+            && what !== null
+            && typeof what.then == "function"
+
+        }
+        function testPromise (){
+
+        }
+        testPromise.then = ()=>{}
+        console.log(isPromiseLike(Promise));
+        console.log(isPromiseLike(Promise.reject()));
+        console.log(isPromiseLike(new Promise(()=>{})));
+        console.log(isPromiseLike({}));
+        console.log(isPromiseLike($.ajax));
+        console.log(isPromiseLike($.ajax())); //true
+        console.log(isPromiseLike(testPromise)); //true
+    </script>
+</body>
+</html>
