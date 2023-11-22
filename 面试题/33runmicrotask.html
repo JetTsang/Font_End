@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 设计一个函数
+        // 使得传入的函数尽可能的运行在微任务当中
+        function runMicroTask(func){
+            // 参考vue nextTick 
+            // 优雅降级
+            if(typeof Promise !== 'undefined'){
+                const p = Promise.resolve()
+                p.then(func)
+            }else if (typeof MutationObserver !== 'undefined'){
+                const ob = new MutationObserver()
+                const textNode  = document.createTextNode()
+                ob.observe(textNode,{
+                    // 监听文字的变化
+                    characterData:true
+                })
+                // 改变文字
+                textNode.textContent = '1'
+            }else {
+                setTimeout(func)
+            }
+        }
+    </script>
+</body>
+</html>
