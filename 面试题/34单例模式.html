@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 在js当中，实现单例模式很困难
+        class People {
+            name
+            age
+            constructor(name,age){
+                this.name = name
+                this.age = age
+            }
+            getName(){
+                console.log(this.name);
+                return this.name
+            }
+            getIns(){
+                if(!this.ins){
+                    this.ins = new People(...arguments)
+                }
+                return this.ins
+            }
+        }
+        People.prototype.getAge = function(){
+            console.log(this.age);
+            return this.age
+        }
+        console.log(People);
+
+        // 闭包 + 构造函数
+        let ins = null
+        function SignleIns(){
+            if(!ins){
+                ins = new People(...arguments)
+            }
+            return ins
+        }
+        SignleIns.prototype.getName = function(){
+            console.log(this.name);
+            return this.name
+        }
+        const a = new SignleIns('jet',19)
+        const b = new SignleIns('jet',18)
+        console.log(a,b,a===b);
+
+        // 还可以再包裹一层，更灵活，将类的名称传入
+        // 和ins变量闭包控制
+        // 写法1 返回一个构造函数
+        function crateSignleInst(ClassName){
+            let ins = null
+            return function SignleIns(){
+                if(!ins){
+                    ins = new ClassName(...arguments)
+                }
+                return ins
+            }
+        }        
+        // 写法2 返回一个类，在类的constructor里面返回实例
+        function crateSignleInst(ClassName){
+            let ins = null
+            return class SignleIns {
+                constructor(){
+                    if(!ins){
+                        ins = new ClassName(...arguments)
+                    }
+                    return ins
+                }
+            }
+        }        
+        const PeopleIns = crateSignleInst(People)
+        // 这里上方法，无效
+        PeopleIns.prototype.sayHello = function(){
+            console.log('你好呀',this.name);
+        }
+        const c = new PeopleIns('jet',19)
+        // c.sayHello() //c.sayHello is not a function.  因为这里返回的是people的实例
+        console.log(
+
+            new PeopleIns('jet',19) == new PeopleIns('jet',11)
+        );
+        // 缺点，上原型不方便 
+        // PeopleIns.prototype.xxx ,其实是给返回的包装类上添加方法
+
+        // function SignleIns(className){
+        //     const ins
+        //     return function(){
+        //         return class Wrapper{
+        //             constructor(){
+        //                 new className(arguments)
+        //             }
+        //         }
+        //     }
+        // }
+
+        // SignleIns()()
+
+        // 利用代理，强烈推荐！！！
+        // 目前比较完美的方案！！！
+        function crateSignleInsProxy(ClassName){
+            let ins = null
+            return new Proxy(ClassName,{
+                // 拦截构造器
+                construct(target,args){
+                    if(!ins){
+                        ins = new target(...args)
+                    }
+                    return ins
+                }
+            })
+        }  
+        const ProxySignlePeople = crateSignleInsProxy(People)
+        const d = new ProxySignlePeople('jet',10)
+        const e = new ProxySignlePeople('jet',19)
+        ProxySignlePeople.prototype.sayHello = function(){
+            console.log('你好呀',this.name);
+        }
+        console.log(
+            d,e,d === e
+        );
+        d.sayHello()
+        e.sayHello()
+
+
+    </script>
+</body>
+</html>
