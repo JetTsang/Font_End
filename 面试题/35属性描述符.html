@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var obj = {
+            name: 'JetTsang',
+            gender: 1,
+        }
+        obj.__proto__.getName = ()=>{
+            return obj.name
+        }
+        for(const i in obj){
+            console.log(i);
+//             [Log] name (35属性描述符.html, line 19)
+                // [Log] gender (35属性描述符.html, line 19)
+                // [Log] getName (35属性描述符.html, line 19)
+        }
+        // 问题： 这里getName 能被便遍历到
+        // 原因：enumerable
+        console.log(
+
+            Object.getOwnPropertyDescriptor(obj.__proto__,'getName')
+        );
+        Object.defineProperty(obj.__proto__,'_getName',{
+            value: function(){
+                return obj.name
+            },
+            enumerable:false
+        })
+
+        // 这里不可被遍历到
+        for(const i in obj){
+            console.log(i);
+        }
+
+    </script>
+</body>
+</html>
