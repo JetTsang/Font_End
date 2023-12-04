@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var o = (function(){
+            var obj = {
+                name: 'Bruce',
+                age: 25
+            }
+            return {
+                get(k){
+                    return obj[k]
+                }
+            }
+        })()
+        // 问题： 攻破此方法，拿到闭包内的obj对象
+        console.log(
+            
+            o.get('111')
+        );
+        // 失败：this指向不对
+        // Object.prototype.valueOf()
+        // 思路： 利用原型链
+        Object.defineProperty(Object.prototype,'getObj',{
+            get(){
+                return this
+            }
+        })
+        console.log(
+            o.get('getObj'),
+            // 成功修改
+            o.get('getObj').name ="JetTsang",
+        );
+        // 扩展题：如何避免原型链攻击？
+        // 1.切断原型链
+        // 2.Object.hasOwnProperty,判断是否是该对象本身的属性
+        // Reflect.has 和 in 操作符一样，
+        // 如果该属性存在于原型链中，返回 true
+    </script>
+</body>
+</html>
