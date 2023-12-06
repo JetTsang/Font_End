@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 任务暂停和执行
+        // 每个任务有原子性，不可中断，只能在任务中途中断
+        function processTasks (...tasks){
+
+        }
+        function createTask(){
+            return new Promise((res,rej)=>{
+                setTimeout(res,1000)
+            })
+        }
+        const processer = processTasks(()=>createTask(),()=>createTask())
+    </script>
+</body>
+</html>
