@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function getPikachu() {
+        return fetch("https://api.pokemontcg.io/v2/cards?q=name:pikachu")
+          .then((response) => response.json())
+          .catch((error) => {
+            console.error("Failed to load Pikachu image:", error);
+          });
+      }
+      async function task1() {
+        return await getPikachu();
+      }
+      async function task2() {
+        return await task1();
+      }
+      async function task3() {
+        return await task2();
+      }
+
+      async function main() {
+        const res = await task3();
+        const pikachuImageUrl = res.data[0].images.small;
+        const imgElement = document.createElement("img");
+        imgElement.src = pikachuImageUrl;
+        document.body.appendChild(imgElement);
+      }
+      main();
+    //  问题： 以上的方案有了传染性了，1个异步，就导致后续的都要有async 
+      // 思路： 用throw new Error 中断并且返回Promise，同时在catch里面then重新再次调用
+      
+    </script>
+  </body>
+</html>
