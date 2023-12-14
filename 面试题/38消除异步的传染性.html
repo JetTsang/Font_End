@@ -32,10 +32,54 @@
         imgElement.src = pikachuImageUrl;
         document.body.appendChild(imgElement);
       }
-      main();
+      // main();
     //  问题： 以上的方案有了传染性了，1个异步，就导致后续的都要有async 
       // 思路： 用throw new Error 中断并且返回Promise，同时在catch里面then重新再次调用
-      
+      const t1 = ()=> getPikachu()
+      const t2 = ()=> t1()
+      const t3 = ()=> t2()
+     const getPic = ()=>{
+      console.log('zzs');
+      const res = t3()
+      console.log(res);
+     }
+     const run = ()=>{
+      const _fetch = window.fetch
+      let cache = {
+        status:'pending',
+        data:''
+      }
+      window.fetch = (...args)=>{
+        if(cache.status == 200){
+          return {
+            then(cb){
+              console.log('紧着了');
+              return cb(cache)
+            }
+          }
+        }
+        const prm = _fetch(...args).then(res=>{
+          // cache.status = 'fulfilled'
+          // console.log(res);
+          // cache.data = res
+          cache = res
+        },(err)=>{
+          cache.status = 'fulfilled'
+          cache.data = err
+        })
+        throw prm
+      }
+
+      try {
+        getPic()
+      } catch (error) {
+        if(error instanceof Promise){
+          error.then(getPic,getPic)
+        }
+      }
+       
+     }
+     run()
     </script>
   </body>
 </html>
