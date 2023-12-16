@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 使用流式来读取返回的数据
+        async function getData(content){
+            const res =  await fetch(url,{
+                method:'post',
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({content})
+            })
+            
+            const textDecoder = new TextDecoder()
+            // 这里可以放入unit8IntArray
+            textDecoder.decode()
+            // 这里读取
+            const reader = res.body.getReader()
+            const {done,value} = await reader.read()
+            // 
+            if(done) return 
+
+
+            const r = await res.text()
+            
+        }
+    </script>
+</body>
+</html>
