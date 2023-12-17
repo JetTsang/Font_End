@@ -9,9 +9,16 @@
 <body>
     <script>
         // 任务暂停和执行
-        // 每个任务有原子性，不可中断，只能在任务中途中断
+        // 每个任务有原子性，不可中断，只能在任务和任务执行的间隔之间中断
         function processTasks (...tasks){
+            // 这里初始化吧
+            return { 
+                run(){
 
+                },
+                pause(){}
+
+            }
         }
         function createTask(){
             return new Promise((res,rej)=>{
@@ -19,6 +26,11 @@
             })
         }
         const processer = processTasks(()=>createTask(),()=>createTask())
+        processer.run()
+        // 能停止
+        processer.pause()
+        // 能重新运行
+        processer.run()
     </script>
 </body>
 </html>
