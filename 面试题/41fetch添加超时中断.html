@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 给fetch添加1个超时中断功能
+        function createFetch(delay = 999){
+            return function fetchWrape(url,options = {}){
+                return new Promise((resolve,reject)=>{
+                    const controll = new AbortController()
+
+                    if(options.signal instanceof AbortController){
+                        options.signal.addEventListener('abort',()=>{
+                            controll.abort()
+                        })
+                    }
+
+                    options.signal = controll.signal
+
+                    setTimeout(()=>{
+                        controll.abort()
+                    },delay)
+
+                    fetch(url,options).then(resolve,reject)
+                })
+            }
+        }
+
+        const fetch = createFetch(9999)
+
+    </script>
+</body>
+</html>
