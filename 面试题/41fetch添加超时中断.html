@@ -32,7 +32,21 @@
         }
 
         const fetch = createFetch(9999)
-
+        // 方法2 
+        function createFetch2(delay){
+            return function fetch2(url,options){
+                return Promise.race(
+                    [
+                        fetch(url,options),
+                        new Promise((resolve,reject)=>{
+                            setTimeout(reject,delay)
+                        })
+                    ]
+                )
+            }
+        }
+        const f = createFetch2(200)
+        f('baidu.com').then(res=>console.log(res))
     </script>
 </body>
 </html>
