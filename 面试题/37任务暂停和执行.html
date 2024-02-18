@@ -8,29 +8,66 @@
 </head>
 <body>
     <script>
+        function createTask(){
+            return new Promise((res,rej)=>{
+                const target = (Math.random()*10).toFixed(10)
+                console.log('任务:'+target+'开始执行');
+                setTimeout(()=>{
+                    // 执行结束
+                    console.log('任务:'+target+'执行结束');
+                    res(target)
+                },1000)
+            })
+        }
         // 任务暂停和执行
         // 每个任务有原子性，不可中断，只能在任务和任务执行的间隔之间中断
+        // 同时最后完成需要将全部任务的结果返回
         function processTasks (...tasks){
+            let isPause = false
+            const taskQueue = tasks.slice()
+            const resList = []
+            let pro = null
+            let resFn = null
             // 这里初始化吧
             return { 
                 run(){
-
+                    isPause = false
+                    const cb = async (resolve)=>{
+                        resFn = resolve
+                        if(isPause) return 
+                        if(taskQueue.length == 0 ){
+                            resFn(resList)
+                            return 
+                        }
+                        // 取出任务并执行
+                        const task  = taskQueue.shift()
+                        const res = await task()
+                        resList.push(res)
+                        cb(resolve)
+                    }
+                    if(!pro){
+                        pro = new Promise(cb)
+                    }else{
+                        cb(resFn)
+                    }
+                    return pro
                 },
-                pause(){}
+                pause(){
+                    isPause = true
+                }
 
             }
         }
-        function createTask(){
-            return new Promise((res,rej)=>{
-                setTimeout(res,1000)
-            })
-        }
         const processer = processTasks(()=>createTask(),()=>createTask())
-        processer.run()
+        const res = processer.run()
+        console.log(res);
         // 能停止
         processer.pause()
-        // 能重新运行
-        processer.run()
+        setTimeout(()=>{
+            // 能重新运行
+            const res = processer.run()
+            console.log(res);
+        },2000)
     </script>
 </body>
 </html>
