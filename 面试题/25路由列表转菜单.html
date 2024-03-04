@@ -707,51 +707,87 @@
        *
        *
        * */
-      function reverseRoutesPath(arr,currentLevel=0){
-        let obj = {}
-        let upperPath
-        arr.forEach(item=>{
-          // 1.  有path/routes 去区分是否到底部了
-          if(item.routes){
-            // 递归
-            const { children ,upperPath:thisPath}= reverseRoutesPath(item.routes,currentLevel + 1)
-            if(thisPath){
-              if(obj[thisPath]){
-                obj[thisPath].children = {...obj[thisPath].children,...children}
-                obj[thisPath].title = item.name
-              }else{
-                obj[thisPath] = {
-                  title:item.name,
-                  children
+
+      function transformRoutesPath(arr) {
+        function reverseRoutesPath(arr, currentLevel = 0) {
+          let obj = {};
+          let upperPath;
+          arr.forEach((item) => {
+            // 1.  有path/routes 去区分是否到底部了
+            if (item.routes) {
+              // 递归
+              const { children, upperPath: thisPath } = reverseRoutesPath(
+                item.routes,
+                currentLevel + 1
+              );
+              // console.log(children,thisPath)
+              if (thisPath) {
+                if (obj[thisPath]) {
+                  obj[thisPath].children = {
+                    ...obj[thisPath].children,
+                    ...children,
+                  };
+                  obj[thisPath].title = item.name;
+                } else {
+                  obj[thisPath] = {
+                    title: item.name,
+                    children,
+                  };
                 }
+              } else if (item.path) {
+                obj[item.path] = {
+                  title: item.name,
+                  children,
+                };
               }
-            }
-          }else if(item.path){
-            const pathArr = item.path.substring(1).split('/')
-            const key = pathArr[currentLevel]
-            if(!upperPath && (currentLevel-1) >=0){
-              upperPath = pathArr[currentLevel-1]
-            }
-            obj = Object.assign(obj, {
+            } else if (item.path) {
+              const pathArr = item.path.substring(1).split("/");
+              const key = pathArr[currentLevel];
+              if (!upperPath && currentLevel - 1 >= 0) {
+                upperPath = pathArr[currentLevel - 1];
+              }
+              obj = Object.assign(obj, {
                 [key]: {
                   title: item.name,
                   // 添加上原有的属性，不需要可以删掉
-                  ...item
-                }
-              }
-            )
-          }
-        })
-        return {children:obj,upperPath}
-      }
-      function transformRoutesPath (arr){
-        const res = reverseRoutesPath(arr,0)
-        return {
-          ...res.children
+                  ...item,
+                },
+              });
+            }
+          });
+          return { children: obj, upperPath };
         }
+        const res = reverseRoutesPath(arr, 0);
+        return {
+          ...res.children,
+        };
       }
-      
-      console.log(transformRoutesPath (arr));
+      const list = [
+        {
+          name: "客户系统",
+          path: "merchant",
+          routes: [
+            // {
+            //   name: "首页",
+            //   path: "/merchant/home",
+            //   icon: "home",
+            // },
+            {
+              name: "基础配置",
+              path: "baseConfigure",
+              icon: "base",
+              routes: [
+                {
+                  name: "客户等级",
+                  path: "/merchant/baseConfigure/level",
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      console.log(transformRoutesPath(arr));
+      console.log(transformRoutesPath(list));
     </script>
   </body>
 </html>
