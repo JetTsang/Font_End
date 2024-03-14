@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        //  问题： 能否从外部获取到promise的状态呢？ 
+        //  不能话，有什么方法可以呢？ 
+        // 重写Promise
+        class CustomPromise extends Promise { 
+            constructor(executor){
+                
+                super((resolve,reject)=>{
+                    executor((value)=>{
+                        this.status = 'resolved'
+                        resolve(value)
+                    },(reason)=>{
+                        this.status = 'rejected'
+                        reject(reason)
+                    })
+                })
+                this.status = 'pending'  
+            }
+        }
+        const cPrm = new CustomPromise((resolve,reject)=>{
+            setTimeout(()=>{
+                reject()
+            },3000)
+        })
+        console.log(
+
+            cPrm.status
+        );
+    </script>
+</body>
+</html>
