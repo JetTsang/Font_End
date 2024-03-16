@@ -16,7 +16,7 @@
                 
                 super((resolve,reject)=>{
                     executor((value)=>{
-                        this.status = 'resolved'
+                        this.status = 'fulfilled'
                         resolve(value)
                     },(reason)=>{
                         this.status = 'rejected'
@@ -28,7 +28,7 @@
         }
         const cPrm = new CustomPromise((resolve,reject)=>{
             setTimeout(()=>{
-                reject()
+                resolve()
             },3000)
         })
         console.log(
