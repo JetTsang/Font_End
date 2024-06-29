@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="btn">点击暂停</button>
+    <script>
+      // 题目： 完成createEL 函数，使得下面的逻辑可以正常执行
+      (async () => {
+        const btn = createEL("#btn");
+        while (1) {
+          const res = await btn.waitClick;
+          console.log("点击了",res);
+        }
+      })();
+      //   function createEL(selectors) {}
+
+      //   简易探索，只能用一次
+      //   显然不满足
+    //   function createEL(selectors) {
+    //     const dom = document.querySelector(selectors);
+    //     dom.waitClick = new Promise((resolve) => {
+    //       dom.addEventListener("click", resolve);
+    //     });
+    //     return dom;
+    //   }
+      // 方法1 ，利用Get 访问器
+    //   function createEL(selectors) {
+    //     const dom = document.querySelector(selectors);
+    //     const ret = {
+    //       ...dom,
+    //       get waitClick() {
+    //         return new Promise((resolve) => {
+    //           dom.addEventListener("click", resolve);
+    //         });
+    //       },
+    //     };
+
+    //     return ret;
+    //   }
+
+      //   方法2： 通过代理
+      function createEL(selectors) {
+        const dom = document.querySelector(selectors);
+        let resolveGlo = null;
+        dom.addEventListener("click", (e)=>{
+            resolveGlo && resolveGlo(e)
+        });
+        return new Proxy(dom, {
+          get(target, p) {
+            console.log(p)
+            if (p.toLowerCase().endsWith("click")) {
+              return new Promise((resolve) => {
+                resolveGlo = resolve
+              });
+            }else{
+                return Reflect.get(target,p)
+            }
+          },
+        });
+      }
+    </script>
+  </body>
+</html>
