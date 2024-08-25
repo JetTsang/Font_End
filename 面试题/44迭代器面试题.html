@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 解构的本质
+        // 迭代器
+        // 实现一个迭代器
+        Object.prototype[Symbol.iterator] = function ( ){
+            // 获取到数组，给数组的每一项赋值
+            const arr = Object.values(this)
+            // 返回迭代器执行的对象{value: done:}
+            return arr[Symbol.iterator]()
+        }
+        // 使得下面成立
+        var [a,b] = {a:1,b:2}
+        // 添加原形
+        console.log(a,b)
+    </script>
+</body>
+</html>
